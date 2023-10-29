@@ -46,6 +46,8 @@ public class GameMap {
                         TreasureState.UnknownTreasure,
                         FortState.NoFort
                 );
+
+
                 map.add(field);
             }
         }

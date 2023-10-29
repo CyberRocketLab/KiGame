@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 public class MapValidator {
@@ -22,7 +23,16 @@ public class MapValidator {
 
     public boolean validateMap() {
         Stack<Position> stack = new Stack<>();
-        stack.push(new Position(0,0));
+        int horX = 0;
+        int vertY = 0;
+
+        while (matrix[vertY][horX].getTerrain() == Terrain.WATER) {
+            vertY = (int) (Math.random() * maxRows);
+            horX = (int) (Math.random() * maxCol);
+        }
+
+        stack.push(new Position(horX,vertY));
+
 
         while (!stack.empty()) {
             Position currentPosition = stack.pop();

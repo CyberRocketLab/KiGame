@@ -57,7 +57,7 @@ public class MainGame {
            ++i;
        }
 
-        System.out.println("IS THE MAP VALID?");
+        System.out.println("\n IS THE MAP VALID?");
         System.out.println(gameMap.validateMap());
 
 
