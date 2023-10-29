@@ -35,6 +35,7 @@ public class MainGame {
       int i = 0;
 
       System.out.println(gameMap.getMap().size());
+
        for (Field field : gameMap.getMap()) {
            if (i == 10) {
                System.out.println(" ");
@@ -56,6 +57,8 @@ public class MainGame {
            ++i;
        }
 
+        System.out.println("IS THE MAP VALID?");
+        System.out.println(gameMap.validateMap());
 
 
     }

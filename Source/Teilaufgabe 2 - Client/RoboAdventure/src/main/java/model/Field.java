@@ -14,6 +14,7 @@ public abstract class Field {
         this.playerPositionState = playerPositionState;
     }
 
+
     public Terrain getTerrain() {
         return terrain;
     }

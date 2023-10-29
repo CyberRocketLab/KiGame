@@ -1,8 +1,8 @@
 package model;
 
 public class FieldClient extends Field{
-    TreasureState treasureState;
-    FortState fortState;
+    private TreasureState treasureState;
+    private FortState fortState;
 
     public FieldClient(int positionX,
                        int positionY,
@@ -14,6 +14,15 @@ public class FieldClient extends Field{
         super(positionX, positionY, terrain, playerPositionState);
         this.treasureState = treasureState;
         this.fortState = fortState;
+    }
+
+    // Creating Copy Contructor for Deep Copy
+    public FieldClient(Field field) {
+        super(field.getPositionX(), field.getPositionY(), field.getTerrain(), field.getPlayerPositionState());
+
+        // Default State
+        this.treasureState =  TreasureState.UnknownTreasure;
+        this.fortState = FortState.NoFort;
     }
 
     public TreasureState getTreasureState() {

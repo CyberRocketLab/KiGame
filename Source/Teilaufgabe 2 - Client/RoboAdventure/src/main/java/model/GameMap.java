@@ -36,8 +36,8 @@ public class GameMap {
         Collections.shuffle(randomField, new Random());
 
 
-        for (int posX = 0; posX < 10; ++posX) {
-            for (int posY = 0; posY < 5; ++posY) {
+        for (int posY = 0; posY < 5; ++posY) {
+            for (int posX = 0; posX < 10; ++posX) {
                 Field field = new FieldClient(
                         posX,
                         posY,
@@ -50,6 +50,12 @@ public class GameMap {
             }
         }
 
+
+    }
+
+    public boolean validateMap() {
+        MapValidator mapValidator = new MapValidator(map);
+        return mapValidator.validateMap();
     }
 
     public List<Field> getMap() {
