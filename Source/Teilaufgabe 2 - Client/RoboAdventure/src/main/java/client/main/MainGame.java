@@ -1,12 +1,14 @@
 package client.main;
 
 import controller.ClientController;
-import model.ClientData;
+import model.*;
+
+import java.util.*;
 
 public class MainGame {
     public static void main(String[] args) {
 
-        // Getting URL and GameID from user input;
+        /*// Getting URL and GameID from user input;
         String serverBaseUrl = args[1];
         String gameId = args[2];
 
@@ -24,7 +26,37 @@ public class MainGame {
         controller.registerClient();
 
         ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
-        controller2.registerClient();
+        controller2.registerClient();*/
+
+       GameMap gameMap = new GameMap();
+       gameMap.generateMap();
+
+
+      int i = 0;
+
+      System.out.println(gameMap.getMap().size());
+       for (Field field : gameMap.getMap()) {
+           if (i == 10) {
+               System.out.println(" ");
+               i = 0;
+           }
+
+           if (field.getTerrain() == Terrain.WATER) {
+               System.out.print("  ~   ");
+           }
+
+           if (field.getTerrain() == Terrain.MOUNTAIN) {
+               System.out.print("  ^   ");
+           }
+
+           if (field.getTerrain() == Terrain.GRASS) {
+               System.out.print(" ...  ");
+           }
+
+           ++i;
+       }
+
+
 
     }
 }

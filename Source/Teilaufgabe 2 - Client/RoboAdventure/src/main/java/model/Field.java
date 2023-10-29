@@ -13,4 +13,29 @@ public abstract class Field {
         this.terrain = terrain;
         this.playerPositionState = playerPositionState;
     }
+
+    public Terrain getTerrain() {
+        return terrain;
+    }
+
+    public void setTerrain(Terrain terrain) {
+        this.terrain = terrain;
+    }
+
+    public PlayerPositionState getPlayerPositionState() {
+        return playerPositionState;
+    }
+
+    public void setPlayerPositionState(PlayerPositionState playerPositionState) {
+        this.playerPositionState = playerPositionState;
+    }
+
+    public int getPositionX() {
+        return positionX;
+    }
+
+    public int getPositionY() {
+        return positionY;
+    }
+
 }
