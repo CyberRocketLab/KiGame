@@ -1,4 +1,4 @@
-package model;
+package model.data;
 
 public class ClientData {
     private final String studentFirstName;

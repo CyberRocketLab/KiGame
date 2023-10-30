@@ -1,8 +1,12 @@
-package model;
+package model.validator;
+
+import model.position.Position;
+import model.data.Field;
+import model.data.Terrain;
+import model.state.PlayerPositionState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Stack;
 
 public class MapValidator {
@@ -10,16 +14,16 @@ public class MapValidator {
     private final int maxRows;
     private final int maxCol;
 
-    public MapValidator(List<Field> originalMap, int maxRows, int maxCol) {
-        for (Field field : originalMap) {
-            mapToValidate.add(new FieldClient(field));
-        }
-
+    public MapValidator(int maxRows, int maxCol) {
         this.maxRows = maxRows;
         this.maxCol = maxCol;
     }
 
-    public boolean validateMap() {
+    public boolean validateMap(List<Field> originalMap) {
+        for (Field field : originalMap) {
+            mapToValidate.add(new Field(field));
+        }
+
         // Initialising matrix with maxRows and maxCol
         Field[][] matrix = new Field[maxRows][maxCol];
 

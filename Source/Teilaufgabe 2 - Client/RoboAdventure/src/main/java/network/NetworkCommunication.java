@@ -3,10 +3,9 @@ package network;
 import messagesbase.ResponseEnvelope;
 import messagesbase.UniquePlayerIdentifier;
 import messagesbase.messagesfromclient.*;
-import model.ClientData;
-import model.Field;
-import model.FieldClient;
-import model.FortState;
+import model.data.ClientData;
+import model.data.Field;
+import model.state.FortState;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -43,28 +42,21 @@ public class NetworkCommunication {
 
 
         for (Field field : clientMap) {
-            if (field instanceof FieldClient) {
                 boolean fortPresent = false;
                 ETerrain terrain = null;
 
-                if (((FieldClient) field).getFortState() == FortState.MyFort) {
+                if (field.getFortState() == FortState.MyFort) {
                     fortPresent = true;
                 }
 
-                switch (field.getTerrain()) {
-                    case GRASS:
-                        terrain = ETerrain.Grass;
-                        break;
-                    case WATER:
-                        terrain = ETerrain.Water;
-                        break;
-                    case MOUNTAIN:
-                        terrain = ETerrain.Mountain;
-                        break;
-                }
+                terrain = switch (field.getTerrain()) {
+                    case GRASS -> ETerrain.Grass;
+                    case WATER -> ETerrain.Water;
+                    case MOUNTAIN -> ETerrain.Mountain;
+                };
 
                 clientMapToSend.add(new PlayerHalfMapNode(field.getPositionX(), field.getPositionY(), fortPresent, terrain));
-            }
+
         }
 
         PlayerHalfMap playerHalfMap = new PlayerHalfMap(clientData.getPlayerID(), clientMapToSend);

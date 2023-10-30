@@ -1,12 +1,23 @@
-package model;
+package model.generator;
 
-import java.util.*;
+import model.data.Field;
+import model.data.Terrain;
+import model.state.FortState;
+import model.state.PlayerPositionState;
+import model.state.TreasureState;
 
-public class GameMap {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+public class GameMapGenerator {
     private final List<Field> map = new ArrayList<>();
 
+    public GameMapGenerator() {
+    }
 
-    public void generateMap() {
+    public void generateRandomMap(int maxRows, int maxColumns) {
         List<Terrain> terrainList = new ArrayList<>();
         boolean fortExists = false;
 
@@ -41,12 +52,12 @@ public class GameMap {
         Collections.shuffle(terrainList, new Random());
 
 
-        for (int posY = 0; posY < 5; ++posY) {
-            for (int posX = 0; posX < 10; ++posX) {
+        for (int posY = 0; posY < maxRows; ++posY) {
+            for (int posX = 0; posX < maxColumns; ++posX) {
                 Terrain randomTerrain = terrainList.remove(0);
 
                 if(!fortExists && randomTerrain == Terrain.GRASS) {
-                    Field field = new FieldClient(
+                    Field field = new Field(
                             posX,
                             posY,
                             randomTerrain,
@@ -60,7 +71,7 @@ public class GameMap {
                     continue;
                 }
 
-                Field field = new FieldClient(
+                Field field = new Field(
                         posX,
                         posY,
                         randomTerrain,
@@ -72,13 +83,6 @@ public class GameMap {
                 map.add(field);
             }
         }
-    }
-
-    public boolean validateMap() {
-        int maxColumns = 10;
-        int maxRows = 5;
-        MapValidator mapValidator = new MapValidator(map, maxRows, maxColumns);
-        return mapValidator.validateMap();
     }
 
     public List<Field> getMap() {
