@@ -1,6 +1,7 @@
 package client.main;
 
 import controller.ClientController;
+import controller.GamePlay;
 import model.*;
 
 import java.util.*;
@@ -28,43 +29,47 @@ public class MainGame {
         ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
         controller2.registerClient();*/
 
-       GameMap gameMap = new GameMap();
-       gameMap.generateMap();
+
+
+       GamePlay gameMap = new GamePlay();
+       gameMap.generateClientHalfMap();
 
 
       int i = 0;
 
-      System.out.println(gameMap.getMap().size());
+      System.out.println(gameMap.getClientHalfMap().size());
+     for (Field field : gameMap.getClientHalfMap()) {
 
-       for (Field field : gameMap.getMap()) {
            if (i == 10) {
                System.out.println(" ");
                i = 0;
            }
 
-
-
            if (field.getTerrain() == Terrain.WATER) {
+
                int x = 0x1F30A;
                System.out.print(Character.toString(x) + "");
            }
 
            if (field.getTerrain() == Terrain.MOUNTAIN) {
+
                System.out.print(Character.toString(0x26F0) + "");
            }
 
            if (field.getTerrain() == Terrain.GRASS) {
-               System.out.print(Character.toString(0x1F33F) + "");
+               if (field instanceof FieldClient) {
+
+                   if (((FieldClient) field).getFortState() == FortState.MyFort) {
+                       System.out.print(Character.toString(0x1F3F0) + "");
+                   } else {
+                       System.out.print(Character.toString(0x1F33F) + "");
+                   }
+               }
+
            }
 
            ++i;
        }
-
-        System.out.println("\n IS THE MAP VALID?");
-        System.out.println(gameMap.validateMap());
-
-
-
 
     }
 }

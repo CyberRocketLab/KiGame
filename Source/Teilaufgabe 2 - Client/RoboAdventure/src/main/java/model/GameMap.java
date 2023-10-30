@@ -3,14 +3,17 @@ package model;
 import java.util.*;
 
 public class GameMap {
-    private List<Field> map = new ArrayList<>();
-    private int maxRows = 5;
-    private int maxColums = 10;
-
+    private final List<Field> map = new ArrayList<>();
 
 
     public void generateMap() {
-        List<Terrain> randomField = new ArrayList<>();
+        List<Terrain> terrainList = new ArrayList<>();
+        boolean fortExists = false;
+
+        // If Map was generated WRONG the Map will be erased
+        if (!map.isEmpty()) {
+            map.clear();
+        }
 
         // Allowed percent of Fields in the map
         double percentOfWater = 0.14;
@@ -24,25 +27,43 @@ public class GameMap {
         int mountain = (int) (totalQuantityOfFields * percentOfMountain);
 
         for (int i = 0; i < water; ++i) {
-            randomField.add(Terrain.WATER);
+            terrainList.add(Terrain.WATER);
         }
 
         for (int i = 0; i < grass; ++i) {
-            randomField.add(Terrain.GRASS);
+            terrainList.add(Terrain.GRASS);
         }
 
         for (int i = 0; i < mountain; ++i) {
-            randomField.add(Terrain.MOUNTAIN);
+            terrainList.add(Terrain.MOUNTAIN);
         }
 
-        Collections.shuffle(randomField, new Random());
+        Collections.shuffle(terrainList, new Random());
+
 
         for (int posY = 0; posY < 5; ++posY) {
             for (int posX = 0; posX < 10; ++posX) {
+                Terrain randomTerrain = terrainList.remove(0);
+
+                if(!fortExists && randomTerrain == Terrain.GRASS) {
+                    Field field = new FieldClient(
+                            posX,
+                            posY,
+                            randomTerrain,
+                            PlayerPositionState.NOBODY,
+                            TreasureState.UnknownTreasure,
+                            FortState.MyFort
+                    );
+
+                    fortExists = true;
+                    map.add(field);
+                    continue;
+                }
+
                 Field field = new FieldClient(
                         posX,
                         posY,
-                        randomField.remove(0),
+                        randomTerrain,
                         PlayerPositionState.NOBODY,
                         TreasureState.UnknownTreasure,
                         FortState.NoFort
@@ -51,14 +72,12 @@ public class GameMap {
                 map.add(field);
             }
         }
-
-
-
-
     }
 
     public boolean validateMap() {
-        MapValidator mapValidator = new MapValidator(map, maxRows, maxColums);
+        int maxColumns = 10;
+        int maxRows = 5;
+        MapValidator mapValidator = new MapValidator(map, maxRows, maxColumns);
         return mapValidator.validateMap();
     }
 

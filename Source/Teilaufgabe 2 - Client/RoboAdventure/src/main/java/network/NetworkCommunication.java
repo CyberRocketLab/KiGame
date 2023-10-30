@@ -5,12 +5,15 @@ import messagesbase.UniquePlayerIdentifier;
 import messagesbase.messagesfromclient.ERequestState;
 import messagesbase.messagesfromclient.PlayerRegistration;
 import model.ClientData;
+import model.Field;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public class NetworkCommunication {
     private final String serverBaseURL;
@@ -27,6 +30,10 @@ public class NetworkCommunication {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE) // the network protocol uses
                 // XML
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE).build();
+    }
+
+    public void sendClientMap(List<Field> clientMap) {
+
     }
 
     public void registerClient() {
@@ -51,6 +58,7 @@ public class NetworkCommunication {
         } else {
             UniquePlayerIdentifier uniqueID = resultReg.getData().get();
             System.out.println("My Player ID: " + uniqueID.getUniquePlayerID());
+            clientData.setPlayerID(uniqueID.getUniquePlayerID());
         }
 
     }
