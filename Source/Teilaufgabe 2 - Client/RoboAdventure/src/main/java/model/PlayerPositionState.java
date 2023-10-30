@@ -1,5 +1,5 @@
 package model;
 
 public enum PlayerPositionState {
-    NOBODY, ENEMY, ME, BOTH
+    NOBODY, ENEMY, ME, BOTH, VISITED
 }

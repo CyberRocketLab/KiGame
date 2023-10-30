@@ -42,16 +42,19 @@ public class MainGame {
                i = 0;
            }
 
+
+
            if (field.getTerrain() == Terrain.WATER) {
-               System.out.print("  ~   ");
+               int x = 0x1F30A;
+               System.out.print(Character.toString(x) + "");
            }
 
            if (field.getTerrain() == Terrain.MOUNTAIN) {
-               System.out.print("  ^   ");
+               System.out.print(Character.toString(0x26F0) + "");
            }
 
            if (field.getTerrain() == Terrain.GRASS) {
-               System.out.print(" ...  ");
+               System.out.print(Character.toString(0x1F33F) + "");
            }
 
            ++i;
@@ -59,6 +62,8 @@ public class MainGame {
 
         System.out.println("\n IS THE MAP VALID?");
         System.out.println(gameMap.validateMap());
+
+
 
 
     }

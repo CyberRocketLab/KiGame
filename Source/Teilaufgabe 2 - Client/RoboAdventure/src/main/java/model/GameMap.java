@@ -4,6 +4,8 @@ import java.util.*;
 
 public class GameMap {
     private List<Field> map = new ArrayList<>();
+    private int maxRows = 5;
+    private int maxColums = 10;
 
 
 
@@ -35,7 +37,6 @@ public class GameMap {
 
         Collections.shuffle(randomField, new Random());
 
-
         for (int posY = 0; posY < 5; ++posY) {
             for (int posX = 0; posX < 10; ++posX) {
                 Field field = new FieldClient(
@@ -47,16 +48,17 @@ public class GameMap {
                         FortState.NoFort
                 );
 
-
                 map.add(field);
             }
         }
 
 
+
+
     }
 
     public boolean validateMap() {
-        MapValidator mapValidator = new MapValidator(map);
+        MapValidator mapValidator = new MapValidator(map, maxRows, maxColums);
         return mapValidator.validateMap();
     }
 
