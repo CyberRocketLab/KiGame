@@ -11,10 +11,15 @@ public class ClientController {
     public ClientController(String serverBaseURL, String gameID, ClientData clientData) {
         this.clientData = clientData;
         networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
+
+        gamePlay = new GamePlay();
+        gamePlay.generateClientHalfMap();
     }
 
     public void registerClient() {
         networkCommunication.registerClient();
     }
+
+    public void sendClientMap() {networkCommunication.sendClientMap(gamePlay.getClientHalfMap());}
 
 }

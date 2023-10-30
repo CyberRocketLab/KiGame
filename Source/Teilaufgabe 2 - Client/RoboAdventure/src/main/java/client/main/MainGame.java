@@ -6,10 +6,12 @@ import model.*;
 
 import java.util.*;
 
-public class MainGame {
-    public static void main(String[] args) {
+import static java.lang.Thread.sleep;
 
-        /*// Getting URL and GameID from user input;
+public class MainGame {
+    public static void main(String[] args) throws InterruptedException {
+
+        // Getting URL and GameID from user input;
         String serverBaseUrl = args[1];
         String gameId = args[2];
 
@@ -25,13 +27,22 @@ public class MainGame {
 
         ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
         controller.registerClient();
+        sleep(400);
 
         ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
-        controller2.registerClient();*/
+        controller2.registerClient();
+
+        sleep(400);
+
+        controller.sendClientMap();
+
+        sleep(400);
+
+        controller2.sendClientMap();
 
 
 
-       GamePlay gameMap = new GamePlay();
+    /*   GamePlay gameMap = new GamePlay();
        gameMap.generateClientHalfMap();
 
 
@@ -70,6 +81,6 @@ public class MainGame {
 
            ++i;
        }
-
+        */
     }
 }
