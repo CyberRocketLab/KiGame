@@ -2,23 +2,35 @@ package controller;
 
 import model.data.ClientData;
 import model.data.Field;
+import model.data.GameMap;
 import model.generator.GameMapGenerator;
+import model.state.GamePlayState;
 import model.validator.MapValidator;
 import network.NetworkCommunication;
+import view.GameStateView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientController {
-    GameState gamePlay;
+    GameState gamePlay = new GameState();
+    GameStateView gameStateView;
     NetworkCommunication networkCommunication;
 
     public ClientController(String serverBaseURL, String gameID, ClientData clientData) {
         networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
+        gameStateView = new GameStateView();
+        gamePlay.addPropertyChangeListener(gameStateView);
     }
 
-    public void play() {
+    public synchronized void play() {
+        // Starting & Registering Game
         registerClient();
         sendClientMap();
+
+        // Setting Full Game map
+        gamePlay.updateMap(getGamePlayState().getUpdatedMap());
+
     }
 
     public void registerClient() {
@@ -41,9 +53,13 @@ public class ClientController {
         return gameMap.getMap();
     }
 
-    public synchronized void sendClientMap() {
+    public  void sendClientMap() {
         List<Field> map = generateHalfMap();
         networkCommunication.sendClientMap(map);
+    }
+
+    public GamePlayState getGamePlayState() {
+        return networkCommunication.getGameState();
     }
 
 

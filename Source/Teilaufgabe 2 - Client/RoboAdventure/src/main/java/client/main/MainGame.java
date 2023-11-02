@@ -26,17 +26,15 @@ public class MainGame {
                 "curanova98");
 
         ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
-        controller.registerClient();
 
         ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
-        controller2.registerClient();
 
         Thread t1 = new Thread(() -> {
-            controller.sendClientMap();
+            controller.play();
         });
 
         Thread t2 = new Thread(() -> {
-            controller2.sendClientMap();
+            controller2.play();
         });
 
         t1.start();

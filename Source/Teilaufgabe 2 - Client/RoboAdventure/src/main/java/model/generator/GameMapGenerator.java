@@ -62,7 +62,7 @@ public class GameMapGenerator {
                             posY,
                             randomTerrain,
                             PlayerPositionState.NOBODY,
-                            TreasureState.UnknownTreasure,
+                            TreasureState.NoTreasure,
                             FortState.MyFort
                     );
 
