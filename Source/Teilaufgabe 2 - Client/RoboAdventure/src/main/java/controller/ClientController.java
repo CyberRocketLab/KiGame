@@ -9,12 +9,10 @@ import network.NetworkCommunication;
 import java.util.List;
 
 public class ClientController {
-    ClientData clientData;
-    GamePlay gamePlay;
+    GameState gamePlay;
     NetworkCommunication networkCommunication;
 
     public ClientController(String serverBaseURL, String gameID, ClientData clientData) {
-        this.clientData = clientData;
         networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
     }
 
@@ -36,6 +34,11 @@ public class ClientController {
         }
 
         return gameMap.getMap();
+    }
+
+    public synchronized void sendClientMap() {
+        List<Field> map = generateHalfMap();
+        networkCommunication.sendClientMap(map);
     }
 
 

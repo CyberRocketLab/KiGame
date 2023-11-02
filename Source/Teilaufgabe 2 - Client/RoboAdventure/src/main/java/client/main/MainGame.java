@@ -19,23 +19,32 @@ public class MainGame {
                 "Alexandr",
                 "Curanov",
                 "curanova98");
-/*
 
         ClientData clientData2 = new ClientData(
-                "FirstName",
+                "Valeria",
                 "SecondName",
                 "curanova98");
 
         ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
         controller.registerClient();
-        sleep(400);
 
         ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
         controller2.registerClient();
 
-       */
+        Thread t1 = new Thread(() -> {
+            controller.sendClientMap();
+        });
 
-        ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
+        Thread t2 = new Thread(() -> {
+            controller2.sendClientMap();
+        });
+
+        t1.start();
+        t2.start();
+
+
+
+        /*ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
         GameMap map = new GameMap(controller.generateHalfMap());
 
         int i = 0;
@@ -67,7 +76,7 @@ public class MainGame {
            }
 
            ++i;
-         }
+         }*/
 
     }
 }

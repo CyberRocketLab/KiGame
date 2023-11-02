@@ -46,8 +46,8 @@ public class MapValidator {
 
         while (!stack.empty()) {
             Position currentFieldPosition = stack.pop();
-            int horizontalX = currentFieldPosition.getX();
-            int verticalY = currentFieldPosition.getY();
+            int horizontalX = currentFieldPosition.x();
+            int verticalY = currentFieldPosition.y();
 
             Field currentField = matrix[verticalY][horizontalX];
 

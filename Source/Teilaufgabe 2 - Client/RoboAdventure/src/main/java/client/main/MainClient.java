@@ -187,6 +187,7 @@ public class MainClient {
 		// WebClient support asynchronous message exchange. In SE1 we use a synchronous
 		// one for the sake of simplicity. So calling block is fine.
 		ResponseEnvelope<GameState> requestResult = webAccess.block();
+		GameState game = requestResult.getData().get();
 
 		// always check for errors, and if some are reported, at least print them to the
 		// console (logging should always be preferred!)
