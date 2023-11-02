@@ -75,7 +75,7 @@ public class NetworkCommunication {
         return clientState;
     }
 
-    public String sendClientMap(List<Field> clientMap) {
+    public void sendClientMap(List<Field> clientMap) {
 
         while (getGameState() != ClientState.MustAct) {
             try {
@@ -120,7 +120,7 @@ public class NetworkCommunication {
             System.out.println("ERequestState : " + result.getState());
         }
 
-        return result.getState().toString();
+
     }
 
     public void registerClient() {
