@@ -43,9 +43,6 @@ public class MainGame {
         t2.start();*/
 
 
-                System.out.println("\u03B1 \u03B2 \u03B3"); // Greek letters alpha, beta, gamma
-
-
 
         GameMapGenerator mapGenerator = new GameMapGenerator();
         mapGenerator.generateRandomMap(5,10);
