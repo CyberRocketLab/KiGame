@@ -20,7 +20,7 @@ public class GameStateView implements PropertyChangeListener {
         }
     }
 
-    private void updateMap(GameMap newMap) {
+    public void updateMap(GameMap newMap) {
 
         List<Integer> position = newMap.getMap().stream().map(x -> x.getPositionX()).collect(Collectors.toList());
         int maxX = 9;
@@ -42,7 +42,8 @@ public class GameStateView implements PropertyChangeListener {
 
             switch (field.getTerrain()) {
                 case WATER:
-                    System.out.print(Character.toString(0x1F30A) + " ");
+                    //System.out.print(Character.toString(0x1F30A) + " ");
+                    System.out.print(new String(Character.toChars(0x1F30A)) + " ");
                     break;
                 case MOUNTAIN:
                     System.out.print(Character.toString(0x26F0) + " ");

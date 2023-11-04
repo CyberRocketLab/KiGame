@@ -5,14 +5,16 @@ import model.data.ClientData;
 import model.data.Field;
 import model.data.GameMap;
 import model.data.Terrain;
+import model.generator.GameMapGenerator;
 import model.state.FortState;
+import view.GameStateView;
 
 import static java.lang.Thread.sleep;
 
 public class MainGame {
     public static void main(String[] args) throws InterruptedException {
         // Getting URL and GameID from user input;
-        String serverBaseUrl = args[1];
+       /* String serverBaseUrl = args[1];
         String gameId = args[2];
 
         ClientData clientData = new ClientData(
@@ -38,43 +40,23 @@ public class MainGame {
         });
 
         t1.start();
-        t2.start();
+        t2.start();*/
+
+
+                System.out.println("\u03B1 \u03B2 \u03B3"); // Greek letters alpha, beta, gamma
 
 
 
-        /*ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
-        GameMap map = new GameMap(controller.generateHalfMap());
+        GameMapGenerator mapGenerator = new GameMapGenerator();
+        mapGenerator.generateRandomMap(5,10);
 
-        int i = 0;
-        System.out.println();
-        for (Field field : map.getMap()) {
+        GameMap map = new GameMap(mapGenerator.getMap());
 
-           if (i == 10) {
-               System.out.println(" ");
-               i = 0;
-           }
+        GameStateView gameStateView = new GameStateView();
+        gameStateView.updateMap(map);
 
-           if (field.getTerrain() == Terrain.WATER) {
 
-               int x = 0x1F30A;
-               System.out.print(Character.toString(x) + "");
-           }
 
-           if (field.getTerrain() == Terrain.MOUNTAIN) {
-
-               System.out.print(Character.toString(0x26F0) + "");
-           }
-
-           if (field.getTerrain() == Terrain.GRASS) {
-                   if (field.getFortState() == FortState.MyFort) {
-                       System.out.print(Character.toString(0x1F3F0) + "");
-                   } else {
-                       System.out.print(Character.toString(0x1F33F) + "");
-                   }
-           }
-
-           ++i;
-         }*/
 
     }
 }
