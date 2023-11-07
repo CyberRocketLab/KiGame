@@ -11,6 +11,7 @@ public class Field {
     private PlayerPositionState playerPositionState;
     private TreasureState treasureState;
     private FortState fortState;
+    private boolean visited = false;
 
     public Field(int positionX, int positionY, Terrain terrain, PlayerPositionState playerPositionState, TreasureState treasureState, FortState fortState) {
         this.positionX = positionX;
@@ -68,5 +69,13 @@ public class Field {
 
     public void setFortState(FortState fortState) {
         this.fortState = fortState;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }

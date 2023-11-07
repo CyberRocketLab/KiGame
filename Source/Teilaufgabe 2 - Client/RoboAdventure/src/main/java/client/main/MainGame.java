@@ -7,7 +7,13 @@ import model.data.GameMap;
 import model.data.Terrain;
 import model.generator.GameMapGenerator;
 import model.state.FortState;
+import move.Graph;
+import move.Node;
+import org.springframework.boot.web.server.GracefulShutdownCallback;
 import view.GameStateView;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 
@@ -52,6 +58,29 @@ public class MainGame {
         GameStateView gameStateView = new GameStateView();
         gameStateView.updateMap(map);
 
+        List<Node> nodeList = new LinkedList<>();
+
+        for (Field field : map.getMap()) {
+            nodeList.add(new Node(field));
+        }
+
+        for (Node node : nodeList) {
+            node.addAdjacentNodes(nodeList);
+        }
+
+        Graph graph = new Graph();
+
+        Graph.calculateShortestPathFromSource(nodeList.get(0));
+        Node node = nodeList.get(49);
+        System.out.println("Node to explore: X: " + node.field.getPositionX() + " Y:" +  node.field.getPositionY());
+        System.out.println("Terrain: " + node.field.getTerrain());
+
+       // System.out.println(node.adjacentNodes);
+        for (Node pathNode: node.getShortestPathFromSource()) {
+            System.out.println("Distance in Moves: " + pathNode.getDistanceInMoves());
+            System.out.print("[" + pathNode.field.getPositionX() + "," + pathNode.field.getPositionY() + "] ");
+            System.out.println();
+        }
 
 
 
