@@ -43,7 +43,6 @@ public class NetworkCommunication {
     }
 
     public GamePlayState getGameState() {
-        System.out.println("Currnent Player " + clientData.getStudentFirstName());
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.GET)
                 .uri("/" + gameID + "/states/" + clientData.getPlayerID()).retrieve().bodyToMono(ResponseEnvelope.class);
@@ -60,10 +59,9 @@ public class NetworkCommunication {
                         .findAny()
                         .orElse(null);
 
-
         GamePlayState gamePlayState = new GamePlayState();
         assert playerState != null;
-        gamePlayState.addClientState(playerState.getState());
+        gamePlayState.addClientState(playerState.getState(), playerState.hasCollectedTreasure());
 
         FullMap fullMapNodes = gameState.getMap();
 
@@ -124,6 +122,7 @@ public class NetworkCommunication {
             System.err.println("Client error, errormessage: " + result.getExceptionMessage());
         } else {
             System.out.println("ERequestState : " + result.getState());
+            logger.info("Map was send by Player={}", clientData.getStudentFirstName());
         }
 
 
@@ -152,6 +151,7 @@ public class NetworkCommunication {
             UniquePlayerIdentifier uniqueID = resultReg.getData().get();
            // System.out.println("My Player ID: " + uniqueID.getUniquePlayerID());
             clientData.setPlayerID(uniqueID.getUniquePlayerID());
+            logger.info("Client {} was created!", clientData.getStudentFirstName());
         }
 
     }
@@ -190,6 +190,7 @@ public class NetworkCommunication {
             System.err.println("Move error, errormessage: " + result.getExceptionMessage());
         } else {
             System.out.println("Move send: " + result.getState());
+            logger.info("Move was send by Player={}", clientData.getStudentFirstName());
         }
 
     }

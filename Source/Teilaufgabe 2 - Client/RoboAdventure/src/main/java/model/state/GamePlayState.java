@@ -15,6 +15,7 @@ import java.util.List;
 public class GamePlayState {
     private ClientState clientState = ClientState.MustWait;
     private List<Field> updatedMap = new ArrayList<>();
+    boolean collectedTreasure = false;
 
     public GamePlayState() {
     }
@@ -55,17 +56,21 @@ public class GamePlayState {
             case NoOrUnknownFortState -> fortState = FortState.UnknownFort;
         }
 
+
         updatedMap.add(new Field(posX, posY, terrain, playerPositionState, treasureState, fortState));
 
     }
 
-    public void addClientState(EPlayerGameState ePlayerGameState) {
+    public void addClientState(EPlayerGameState ePlayerGameState, boolean hasCollectedTreasure) {
         clientState = switch (ePlayerGameState) {
             case Won -> ClientState.Won;
             case Lost -> ClientState.Lost;
             case MustAct -> ClientState.MustAct;
             case MustWait -> ClientState.MustWait;
         };
+
+        this.collectedTreasure = hasCollectedTreasure;
+
     }
 
     public ClientState getClientState() {
@@ -74,5 +79,9 @@ public class GamePlayState {
 
     public List<Field> getUpdatedMap() {
         return updatedMap;
+    }
+
+    public boolean isCollectedTreasure() {
+        return collectedTreasure;
     }
 }

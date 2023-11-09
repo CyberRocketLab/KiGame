@@ -7,13 +7,13 @@ import model.state.PlayerPositionState;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class Move {
     private List<Node> nodeList = new LinkedList<>();
     private Node sourceNode;
 
     private List<Node> movesToTargetField = new ArrayList<>();
+    private List<EMoves> moves = new ArrayList<>();
 
     public Move(List<Field> map) {
         map.forEach(field -> this.nodeList.add(new Node(field)));
@@ -32,52 +32,20 @@ public class Move {
                 .findFirst().orElseThrow();
     }
 
+    public Node findNode(Field field) {
+        return nodeList.stream()
+                .filter(node -> node.field.getPositionX() == field.getPositionX() && node.field.getPositionY() == field.getPositionY())
+                .findFirst().orElseThrow();
+    }
+
 
     private void setTargetNode(Node targetNode) {
         movesToTargetField.addAll(targetNode.getShortestPathFromSource());
     }
 
-    public void updatePlayerPosition(EMoves move) {
-        Node currentNode = getPlayerPosition();
-
-        currentNode.field.setPlayerPositionState(PlayerPositionState.NOBODY);
-
-        int newX = currentNode.field.getPositionX();
-        int newY = currentNode.field.getPositionY();
-
-        switch (move) {
-            case Up:
-                --newY;
-                break;
-            case Down:
-                ++newY;
-                break;
-            case Left:
-                --newX;
-                break;
-            case Right:
-                ++newX;
-                break;
-        }
-
-        Node updatePlayerPosition = null;
-
-        for (Node node : nodeList) {
-            if(node.field.getPositionX() == newX && node.field.getPositionY() == newY) {
-                updatePlayerPosition = node;
-                break;
-            }
-        }
-
-        assert updatePlayerPosition != null;
-
-        updatePlayerPosition.field.setPlayerPositionState(PlayerPositionState.ME);
-
-    }
-    public List<EMoves> getMovesToTargetField(Node targetNode) {
+    public void setMovesToTargetField(Node targetNode) {
         setTargetNode(targetNode);
 
-        List<EMoves> moves = new ArrayList<>();
 
         for (int i = 0; i < movesToTargetField.size() - 1; i++) {
             Node currentNode = movesToTargetField.get(i);
@@ -102,9 +70,11 @@ public class Move {
             }
         }
 
-        return moves;
     }
 
+    public List<EMoves> getMoves() {
+        return moves;
+    }
 
     public int calculateMoveCost(Terrain currentTerrain, Terrain nextTerrain) {
 

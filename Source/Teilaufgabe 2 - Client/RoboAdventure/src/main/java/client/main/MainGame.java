@@ -19,8 +19,10 @@ import static java.lang.Thread.sleep;
 
 public class MainGame {
     public static void main(String[] args) throws InterruptedException {
+
+
         // Getting URL and GameID from user input;
-        String serverBaseUrl = args[1];
+       String serverBaseUrl = args[1];
         String gameId = args[2];
 
         ClientData clientData = new ClientData(
@@ -35,9 +37,9 @@ public class MainGame {
 
         ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
 
-        ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
+       // ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
 
-        Thread t1 = new Thread(() -> {
+       /* Thread t1 = new Thread(() -> {
             controller.play();
         });
 
@@ -46,7 +48,10 @@ public class MainGame {
         });
 
         t1.start();
-        t2.start();
+        t2.start();*/
+
+        controller.play();
+
 
 
 /*

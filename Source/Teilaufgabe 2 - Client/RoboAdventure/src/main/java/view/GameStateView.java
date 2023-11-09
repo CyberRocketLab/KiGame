@@ -38,16 +38,20 @@ public class GameStateView implements PropertyChangeListener {
                    //  System.out.print(" ~ ");
                     break;
                 case MOUNTAIN:
-                    System.out.print(Character.toString(0x26F0) + " ");
-                    // System.out.print(" ^ ");
+                    if(field.getPlayerPositionState() == PlayerPositionState.ME || field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
+                        System.out.print(Character.toString(0x1F604) + " ");
+                    } else {
+                        System.out.print(Character.toString(0x26F0) + " ");
+                    }
                     break;
+
                 case GRASS:
                     if (field.getFortState() == FortState.MyFort || field.getFortState() == FortState.EnemyFort) {
                         System.out.print(Character.toString(0x1F3F0) + " ");
                         //  System.out.print(" |=| ");
                     } else if(field.getTreasureState() == TreasureState.GoalTreasure) {
                         System.out.print(Character.toString(0x1F4B0) + " ");
-                    } else if(field.getPlayerPositionState() == PlayerPositionState.ME) {
+                    } else if(field.getPlayerPositionState() == PlayerPositionState.ME || field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
                         System.out.print(Character.toString(0x1F604) + " ");
                     } else {
                         System.out.print(Character.toString(0x1F33F) + " ");
