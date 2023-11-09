@@ -20,7 +20,7 @@ import static java.lang.Thread.sleep;
 public class MainGame {
     public static void main(String[] args) throws InterruptedException {
         // Getting URL and GameID from user input;
-       /* String serverBaseUrl = args[1];
+        String serverBaseUrl = args[1];
         String gameId = args[2];
 
         ClientData clientData = new ClientData(
@@ -46,9 +46,10 @@ public class MainGame {
         });
 
         t1.start();
-        t2.start();*/
+        t2.start();
 
 
+/*
 
         GameMapGenerator mapGenerator = new GameMapGenerator();
         mapGenerator.generateRandomMap(5,10);
@@ -71,7 +72,7 @@ public class MainGame {
         Graph graph = new Graph();
 
         Graph.calculateShortestPathFromSource(nodeList.get(0));
-        Node node = nodeList.get(49);
+        Node node = nodeList.get(2);
         System.out.println("Node to explore: X: " + node.field.getPositionX() + " Y:" +  node.field.getPositionY());
         System.out.println("Terrain: " + node.field.getTerrain());
 
@@ -81,6 +82,7 @@ public class MainGame {
             System.out.print("[" + pathNode.field.getPositionX() + "," + pathNode.field.getPositionY() + "] ");
             System.out.println();
         }
+*/
 
 
 

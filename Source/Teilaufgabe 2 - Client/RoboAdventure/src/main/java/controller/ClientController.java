@@ -4,8 +4,13 @@ import model.data.ClientData;
 import model.data.Field;
 import model.data.GameMap;
 import model.generator.GameMapGenerator;
+import model.state.ClientState;
 import model.state.GamePlayState;
 import model.validator.MapValidator;
+import move.EMoves;
+import move.Move;
+import move.NextFieldToCheck;
+import move.Node;
 import network.NetworkCommunication;
 import view.GameStateView;
 
@@ -28,8 +33,45 @@ public class ClientController {
         registerClient();
         sendClientMap();
 
-        // Setting Full Game map
-        gamePlay.updateMap(getGamePlayState().getUpdatedMap());
+
+        boolean isPlaying = true;
+        while (isPlaying) {
+
+            // Receiving the latest updates from Server
+            GamePlayState gamePlayState = getGamePlayState();
+
+            // Stop game if lost
+            if(gamePlayState.getClientState() == ClientState.Lost) {
+                isPlaying = false;
+                continue;
+            }
+
+            // Updating GameMap
+            gamePlay.updateMap(gamePlayState.getUpdatedMap());
+
+            // Setting Move object with PlayerPosition as source Node
+            Move move = new Move(gamePlay.getMap().getMap()); // TODO: Fix this shit
+
+            // Getting the nextField to check
+            NextFieldToCheck nextFieldFinder = new NextFieldToCheck(gamePlay.getMap(), move.getNodeList());
+            Node nextFieldToCheck = nextFieldFinder.getNextFieldToCheck();
+
+            List<EMoves> movesToTarget = move.getMovesToTargetField(nextFieldToCheck);
+
+            for(EMoves moves : movesToTarget) {
+                sendMoveToServer(moves);
+
+                gamePlayState = getGamePlayState();
+                gamePlay.updateMap(gamePlayState.getUpdatedMap());
+
+
+
+            }
+
+
+
+        }
+
 
     }
 
@@ -60,6 +102,10 @@ public class ClientController {
 
     public GamePlayState getGamePlayState() {
         return networkCommunication.getGameState();
+    }
+
+    public void sendMoveToServer(EMoves move) {
+        networkCommunication.sendMove(move);
     }
 
 

@@ -4,6 +4,8 @@ import model.data.Field;
 import model.data.FieldCompare;
 import model.data.GameMap;
 import model.state.FortState;
+import model.state.PlayerPositionState;
+import model.state.TreasureState;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,6 +45,10 @@ public class GameStateView implements PropertyChangeListener {
                     if (field.getFortState() == FortState.MyFort || field.getFortState() == FortState.EnemyFort) {
                         System.out.print(Character.toString(0x1F3F0) + " ");
                         //  System.out.print(" |=| ");
+                    } else if(field.getTreasureState() == TreasureState.GoalTreasure) {
+                        System.out.print(Character.toString(0x1F4B0) + " ");
+                    } else if(field.getPlayerPositionState() == PlayerPositionState.ME) {
+                        System.out.print(Character.toString(0x1F604) + " ");
                     } else {
                         System.out.print(Character.toString(0x1F33F) + " ");
                         //   System.out.print(" [] ");

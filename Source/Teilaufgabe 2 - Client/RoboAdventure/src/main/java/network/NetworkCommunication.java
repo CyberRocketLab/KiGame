@@ -11,6 +11,9 @@ import model.state.ClientState;
 import model.state.FortState;
 import model.state.GamePlayState;
 import model.state.PlayerPositionState;
+import move.EMoves;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -23,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkCommunication {
+    private static final Logger logger = LoggerFactory.getLogger(NetworkCommunication.class);
+
     private final String gameID;
     private ClientData clientData;
     private final WebClient baseWebClient;
@@ -57,6 +62,7 @@ public class NetworkCommunication {
 
 
         GamePlayState gamePlayState = new GamePlayState();
+        assert playerState != null;
         gamePlayState.addClientState(playerState.getState());
 
         FullMap fullMapNodes = gameState.getMap();
@@ -144,8 +150,46 @@ public class NetworkCommunication {
             System.err.println("Client error, errormessage: " + resultReg.getExceptionMessage());
         } else {
             UniquePlayerIdentifier uniqueID = resultReg.getData().get();
-            System.out.println("My Player ID: " + uniqueID.getUniquePlayerID());
+           // System.out.println("My Player ID: " + uniqueID.getUniquePlayerID());
             clientData.setPlayerID(uniqueID.getUniquePlayerID());
+        }
+
+    }
+
+    public void sendMove(EMoves move) {
+
+        while (getGameState().getClientState() != ClientState.MustAct) {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        EMove moveToSend = null;
+
+        switch (move) {
+            case Up -> moveToSend = EMove.Up;
+            case Down -> moveToSend = EMove.Down;
+            case Left -> moveToSend = EMove.Left;
+            case Right -> moveToSend = EMove.Right;
+        }
+
+        PlayerMove playerMove = PlayerMove.of(clientData.getPlayerID(), moveToSend);
+
+
+        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID + "/moves")
+                .body(BodyInserters.fromValue(playerMove)) // specify the data which is sent to the server
+                .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
+
+
+
+        ResponseEnvelope result = webAccess.block();
+
+        if (result.getState() == ERequestState.Error) {
+            System.err.println("Move error, errormessage: " + result.getExceptionMessage());
+        } else {
+            System.out.println("Move send: " + result.getState());
         }
 
     }

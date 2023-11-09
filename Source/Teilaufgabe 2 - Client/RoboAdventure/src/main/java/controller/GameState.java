@@ -31,6 +31,8 @@ public class GameState {
         changes.addPropertyChangeListener(listener);
     }
 
-
+    public GameMap getMap() {
+        return map;
+    }
 }
 
