@@ -189,7 +189,6 @@ public class NetworkCommunication {
         if (result.getState() == ERequestState.Error) {
             System.err.println("Move error, errormessage: " + result.getExceptionMessage());
         } else {
-            System.out.println("Move send: " + result.getState());
             logger.info("Move was send by Player={}", clientData.getStudentFirstName());
         }
 

@@ -40,6 +40,9 @@ public class Move {
 
 
     private void setTargetNode(Node targetNode) {
+        sourceNode = getPlayerPosition();
+
+        Graph.calculateShortestPathFromSource(sourceNode);
         movesToTargetField.addAll(targetNode.getShortestPathFromSource());
     }
 

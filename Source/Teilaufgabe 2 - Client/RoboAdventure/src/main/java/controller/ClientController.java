@@ -48,7 +48,7 @@ public class ClientController {
 
         boolean isPlaying = true;
         while (isPlaying) {
-
+            logger.debug("Entering While loop");
             // Receiving the latest updates from Server
             GamePlayState gamePlayState = getGamePlayState();
 
@@ -79,10 +79,12 @@ public class ClientController {
 
 
             // Loop till Player has not collected the Treasure
+            if (gamePlayState.isCollectedTreasure())
+                logger.debug("Treasure is Collected");
+
             while(!gamePlayState.isCollectedTreasure()) {
                 if(movesToTarget.isEmpty()) {
-                    System.out.println("Empty Move");
-                    logger.info("The List with moves is empty");
+                    logger.debug("The List with moves is empty");
                     break;
                 }
 
@@ -92,17 +94,20 @@ public class ClientController {
                 gamePlay.updateMap(gamePlayState.getUpdatedMap());
 
                 if (gamePlay.isTreasureFound()) {
-                    logger.info("TREASURE HAS BEEN FOUND");
+                    logger.debug("TREASURE HAS BEEN FOUND");
                     Node treasureNode = move.findNode(gamePlay.getTreasureField());
+
+                    logger.debug("Position of Treasure {}{}.", treasureNode.field.getPositionX(), treasureNode.field.getPositionY());
                     move.setMovesToTargetField(treasureNode);
                     movesToTarget = move.getMoves();
                 }
 
             }
+            // this method while ends because treassure was found
+            // after treasure was found player was not going to it
 
-            logger.info("COOOOOLECTED!");
-            System.out.println("WHILE HERE IS DONE! size of queu:" +  moveStrategies.size());
-
+            logger.debug("End of WhileLoop!");
+            logger.debug("Size of moveStrategies:{}", moveStrategies.size());
 
 
         }

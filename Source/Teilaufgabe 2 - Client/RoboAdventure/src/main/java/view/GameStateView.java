@@ -38,9 +38,11 @@ public class GameStateView implements PropertyChangeListener {
                    //  System.out.print(" ~ ");
                     break;
                 case MOUNTAIN:
-                    if(field.getPlayerPositionState() == PlayerPositionState.ME || field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
+                    if(field.getPlayerPositionState() == PlayerPositionState.ME ) {
                         System.out.print(Character.toString(0x1F604) + " ");
-                    } else {
+                    } else if (field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
+                        System.out.print(Character.toString(0x1F4A9) + " ");
+                    }else {
                         System.out.print(Character.toString(0x26F0) + " ");
                     }
                     break;
@@ -51,8 +53,10 @@ public class GameStateView implements PropertyChangeListener {
                         //  System.out.print(" |=| ");
                     } else if(field.getTreasureState() == TreasureState.GoalTreasure) {
                         System.out.print(Character.toString(0x1F4B0) + " ");
-                    } else if(field.getPlayerPositionState() == PlayerPositionState.ME || field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
+                    } else if(field.getPlayerPositionState() == PlayerPositionState.ME) {
                         System.out.print(Character.toString(0x1F604) + " ");
+                    } else if (field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
+                        System.out.print(Character.toString(0x1F4A9) + " ");
                     } else {
                         System.out.print(Character.toString(0x1F33F) + " ");
                         //   System.out.print(" [] ");
