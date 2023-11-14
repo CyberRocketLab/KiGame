@@ -3,6 +3,7 @@ package controller;
 import model.data.Field;
 import model.data.FieldCompare;
 import model.data.GameMap;
+import model.state.FortState;
 import model.state.PlayerPositionState;
 import model.state.TreasureState;
 
@@ -13,7 +14,9 @@ import java.util.*;
 public class GameState {
     private GameMap map;
     private Boolean treasureFound = false;
+    private Boolean fortFound = false;
     private Field treasureField;
+    private Field fortField;
     private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
     private List<Field> visitedFields = new ArrayList<>();
@@ -29,16 +32,25 @@ public class GameState {
         GameMap beforeChange = this.map;
         this.map = new GameMap(updatedMap);
 
-        Field found = updatedMap.stream()
+        Field foundTreasure = updatedMap.stream()
                 .filter(field -> field.getTreasureState() == TreasureState.GoalTreasure)
                         .findFirst().orElse(null);
+
+        Field foundFort = updatedMap.stream()
+                .filter(field -> field.getFortState() == FortState.EnemyFort)
+                .findFirst().orElse(null);
 
         // Setting Current position as visited and adding it to the list
         setFieldsToVisible(updatedMap);
 
-        if(found != null) {
+        if(foundTreasure != null) {
             treasureFound = true;
-            treasureField = found;
+            treasureField = foundTreasure;
+        }
+
+        if(foundFort != null) {
+            fortFound = true;
+            fortField = foundFort;
         }
 
         //inform all interested parties about changes
@@ -82,6 +94,14 @@ public class GameState {
 
     public Field getTreasureField() {
         return treasureField;
+    }
+
+    public Field getFortField() {
+        return fortField;
+    }
+
+    public Boolean isFortFound() {
+        return fortFound;
     }
 }
 

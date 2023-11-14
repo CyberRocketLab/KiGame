@@ -58,6 +58,9 @@ public class ClientController {
         Node startPosition = null;
         boolean startIsSet = false;
 
+        boolean treasureFoundOnce = false;
+        boolean burgFoundOnce = false;
+
         boolean isPlaying = true;
         while (isPlaying) {
             logger.debug("Entering While loop");
@@ -115,10 +118,19 @@ public class ClientController {
 
                 logger.debug("Position of Treasure {}{}.", treasureNode.field.getPositionX(), treasureNode.field.getPositionY());
                 move.setMovesToTargetField(treasureNode);
+
+            } else if (isTreasureCollected && gamePlay.isFortFound()) {
+                logger.debug("Treasure is collected and Fort has been foung!");
+                Node fortNode = move.findNode(gamePlay.getFortField());
+
+                logger.debug("Position of Treasure {}{}.", fortNode.field.getPositionX(), fortNode.field.getPositionY());
+                move.setMovesToTargetField(fortNode);
+
             } else if(isTreasureCollected)  {
                 logger.debug("Treasure is collected: {}", true);
                 nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(findBurgStrategy.poll(), isTreasureCollected);
                 move.setMovesToTargetField(nextFieldToCheck);
+
             } else {
                 logger.debug("Treasure is collected: {}", false);
                 nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(moveStrategies.poll(), isTreasureCollected);
@@ -135,6 +147,20 @@ public class ClientController {
                 if(movesToTarget.isEmpty()) {
                     logger.debug("The List with moves is empty");
                     break;
+                }
+
+                if(!treasureFoundOnce) {
+                    if (gamePlay.isTreasureFound()) {
+                        treasureFoundOnce = true;
+                        break;
+                    }
+                }
+
+                if (!burgFoundOnce) {
+                    if(gamePlay.isFortFound()) {
+                        burgFoundOnce = true;
+                        break;
+                    }
                 }
 
                 sendMoveToServer(movesToTarget.remove(0));
