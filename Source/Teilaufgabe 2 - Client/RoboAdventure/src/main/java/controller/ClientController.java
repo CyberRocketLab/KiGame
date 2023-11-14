@@ -14,10 +14,7 @@ import move.Node;
 import network.NetworkCommunication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import strategy.LeftCornerDown;
-import strategy.LeftCornerUp;
-import strategy.RightCornerDown;
-import strategy.RightCornerUp;
+import strategy.*;
 import view.GameStateView;
 
 import java.util.*;
@@ -46,6 +43,13 @@ public class ClientController {
         moveStrategies.add(new LeftCornerDown());
         moveStrategies.add(new LeftCornerUp());
 
+        Queue<strategy.MoveStrategy> findBurgStrategy = new LinkedList<>();
+        findBurgStrategy.add(new RightCornerDown());
+        findBurgStrategy.add(new RightCornerUp());
+        findBurgStrategy.add(new LeftCornerDown());
+        findBurgStrategy.add(new LeftCornerUp());
+
+
         GamePlayState gamePlayState = getGamePlayState();
         gamePlay.updateMap(gamePlayState.getUpdatedMap());
       //  Move move = new Move(gamePlay.getMap().getMap()); // TODO: Fix this shit
@@ -63,10 +67,9 @@ public class ClientController {
             // Stop game if lost
             if(gamePlayState.getClientState() == ClientState.Lost || gamePlayState.getClientState() == ClientState.Won) {
                 isPlaying = false;
+                logger.debug("Game: {}", gamePlayState.getClientState());
                 continue;
             }
-
-
 
             Move move = new Move(gamePlay.getMap().getMap()); // TODO: Fix this shit
 
@@ -88,11 +91,18 @@ public class ClientController {
 
 
             if(moveStrategies.isEmpty()) {
-                moveStrategies.add(new RightCornerDown());
+               /* moveStrategies.add(new RightCornerDown());
                 moveStrategies.add(new RightCornerUp());
                 moveStrategies.add(new LeftCornerDown());
-                moveStrategies.add(new LeftCornerUp());
-                logger.debug("The Move Strategy List was empty and has been refilled!");
+                moveStrategies.add(new LeftCornerUp());*/
+
+                moveStrategies.add(new CheckUnvisitedFields());
+                logger.debug("Main Strategy is done. Moving to Plan B strategy!");
+            }
+
+            if(findBurgStrategy.isEmpty()) {
+                findBurgStrategy.add(new CheckUnvisitedFields());
+                logger.debug("Main Strategy is done. Moving to Plan B strategy!");
             }
 
             boolean isTreasureCollected = gamePlayState.isCollectedTreasure();
@@ -105,8 +115,12 @@ public class ClientController {
 
                 logger.debug("Position of Treasure {}{}.", treasureNode.field.getPositionX(), treasureNode.field.getPositionY());
                 move.setMovesToTargetField(treasureNode);
+            } else if(isTreasureCollected)  {
+                logger.debug("Treasure is collected: {}", true);
+                nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(findBurgStrategy.poll(), isTreasureCollected);
+                move.setMovesToTargetField(nextFieldToCheck);
             } else {
-                logger.debug("Treasure is collected: {}", isTreasureCollected);
+                logger.debug("Treasure is collected: {}", false);
                 nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(moveStrategies.poll(), isTreasureCollected);
                 move.setMovesToTargetField(nextFieldToCheck);
             }

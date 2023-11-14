@@ -1,9 +1,2 @@
-/.DS_Store
-/client/
 /controller/
-/logback.xml
-/model/
-/network/
-/view/
-/move/
 /strategy/

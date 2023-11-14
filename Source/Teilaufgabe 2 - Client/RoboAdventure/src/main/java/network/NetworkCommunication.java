@@ -158,6 +158,12 @@ public class NetworkCommunication {
     }
 
     public void sendMove(EMoves move) {
+        ClientState state = getGameState().getClientState();
+
+        if (state == ClientState.Lost || state == ClientState.Won) {
+            logger.info("Game:{}",  state);
+            return;
+        }
 
         while (getGameState().getClientState() != ClientState.MustAct) {
             try {
