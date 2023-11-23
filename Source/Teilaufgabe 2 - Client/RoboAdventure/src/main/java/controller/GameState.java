@@ -21,9 +21,6 @@ public class GameState {
 
     private List<Field> visitedFields = new ArrayList<>();
 
-    public GameState() {
-
-    }
 
     public void updateMap(List<Field> updatedMap) {
         updatedMap.sort(new FieldCompare());
@@ -31,50 +28,49 @@ public class GameState {
         GameMap beforeChange = this.map;
         this.map = new GameMap(updatedMap);
 
-        Field foundTreasure = updatedMap.stream()
+        Optional<Field> foundTreasure = updatedMap.stream()
                 .filter(field -> field.getTreasureState() == TreasureState.GoalTreasure)
-                .findFirst().orElse(null);
+                .findFirst();
 
-        Field foundFort = updatedMap.stream()
+        if(foundTreasure.isPresent()) {
+            treasureFound = true;
+            treasureField = foundTreasure.get();
+        }
+
+        Optional<Field> foundFort = updatedMap.stream()
                 .filter(field -> field.getFortState() == FortState.EnemyFort)
-                .findFirst().orElse(null);
+                .findFirst();
+
+        if(foundFort.isPresent()) {
+            fortFound = true;
+            fortField = foundFort.get();
+        }
 
         setFieldsToVisible(updatedMap);
-
-        if(foundTreasure != null) {
-            treasureFound = true;
-            treasureField = foundTreasure;
-        }
-
-        if(foundFort != null) {
-            fortFound = true;
-            fortField = foundFort;
-        }
+        setPlayerPositionAsVisited(updatedMap);
 
         //inform all interested parties about changes
         changes.firePropertyChange("map", beforeChange, map);
     }
 
     public void setFieldsToVisible(List<Field> updatedMap) {
-
-        // Setting all previous discovered Fields as true
         for(Field field: visitedFields) {
-            Field setField = updatedMap.stream()
+            Optional<Field> setField = updatedMap.stream()
                     .filter(f -> f.getPositionX() == field.getPositionX() && f.getPositionY() == field.getPositionY())
-                    .findFirst().orElseThrow();
+                    .findFirst();
 
-            setField.setVisited(true);
+            setField.ifPresent(value -> value.setVisited(true));
         }
+    }
 
-        // Adding current PlayerPosition to visited Fields
-        Field currentPlayerPosition = updatedMap.stream()
-                .filter(field -> field.getPlayerPositionState() == PlayerPositionState.ME).findFirst().orElse(null);
+    public void setPlayerPositionAsVisited(List<Field> updatedMap) {
+        Optional<Field> currentPlayerPosition = updatedMap.stream()
+                .filter(field -> field.getPlayerPositionState() == PlayerPositionState.ME).findFirst();
 
-        if(currentPlayerPosition != null) {
-            currentPlayerPosition.setVisited(true);
-            visitedFields.add(currentPlayerPosition);
+        if(currentPlayerPosition.isPresent()) {
+            currentPlayerPosition.get().setVisited(true);
+            visitedFields.add(currentPlayerPosition.get());
         }
-
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -83,6 +79,10 @@ public class GameState {
 
     public GameMap getMap() {
         return map;
+    }
+
+    public List<Field> getListOfFields() {
+        return map.getMap();
     }
 
     public Boolean isTreasureFound() {

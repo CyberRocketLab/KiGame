@@ -18,7 +18,6 @@ import static java.lang.Thread.sleep;
 
 public class MainGame {
     public static void main(String[] args) {
-
         try {
             URL serverBaseUrl = new URL(args[1]);
             GameID gameID = new GameID(args[2]);

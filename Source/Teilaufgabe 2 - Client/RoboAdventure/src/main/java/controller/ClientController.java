@@ -59,7 +59,7 @@ public class ClientController {
                 continue;
             }
 
-            Move move = new Move(game.getMap().getMap()); // TODO: Fix this shit
+            Move move = new Move(game.getListOfFields());
 
             if(!startIsSet) {
                 startPosition = move.getPlayerPosition();
