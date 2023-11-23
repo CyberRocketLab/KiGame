@@ -1,10 +1,7 @@
 package client.main;
 
 import controller.ClientController;
-import model.data.ClientData;
-import model.data.Field;
-import model.data.GameMap;
-import model.data.Terrain;
+import model.data.*;
 import model.generator.GameMapGenerator;
 import model.state.FortState;
 import move.Graph;
@@ -12,18 +9,36 @@ import move.Node;
 import org.springframework.boot.web.server.GracefulShutdownCallback;
 import view.GameStateView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
 
 public class MainGame {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
+
+        try {
+            URL serverBaseUrl = new URL(args[1]);
+            GameID gameID = new GameID(args[2]);
+
+            ClientData clientData = new ClientData(
+                    "Alexandr",
+                    "Curanov",
+                    "curanova98");
+
+            ClientController controller = new ClientController(serverBaseUrl, gameID, clientData);
+            controller.play();
+
+        } catch (MalformedURLException e) {
+            System.out.println("The provided server base URL is not valid.");
+        }
 
 
         // Getting URL and GameID from user input;
-       String serverBaseUrl = args[1];
-        String gameId = args[2];
+     /*  String serverBaseUrl = args[1];
+       String gameId = args[2];
 
         ClientData clientData = new ClientData(
                 "Alexandr",
@@ -35,7 +50,7 @@ public class MainGame {
                 "SecondName",
                 "curanova98");
 
-        ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);
+        ClientController controller = new ClientController(serverBaseUrl, gameId, clientData);*/
 
        // ClientController controller2 = new ClientController(serverBaseUrl, gameId, clientData2);
 
@@ -50,7 +65,7 @@ public class MainGame {
         t1.start();
         t2.start();*/
 
-        controller.play();
+      //  controller.play();
 
 
 

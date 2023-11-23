@@ -2,10 +2,10 @@ package controller;
 
 import model.data.ClientData;
 import model.data.Field;
+import model.data.GameID;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
 import model.state.GamePlayState;
-import model.state.MoveStrategy;
 import model.validator.MapValidator;
 import move.EMoves;
 import move.Move;
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import strategy.*;
 import view.GameStateView;
 
+import java.net.URL;
 import java.util.*;
 
 public class ClientController {
@@ -25,7 +26,7 @@ public class ClientController {
     GameStateView gameStateView;
     NetworkCommunication networkCommunication;
 
-    public ClientController(String serverBaseURL, String gameID, ClientData clientData) {
+    public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
         networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
         gameStateView = new GameStateView();
         gamePlay.addPropertyChangeListener(gameStateView);

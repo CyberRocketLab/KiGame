@@ -6,11 +6,10 @@ import messagesbase.messagesfromclient.*;
 import messagesbase.messagesfromserver.*;
 import model.data.ClientData;
 import model.data.Field;
-import model.data.Terrain;
+import model.data.GameID;
 import model.state.ClientState;
 import model.state.FortState;
 import model.state.GamePlayState;
-import model.state.PlayerPositionState;
 import move.EMoves;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,18 +20,18 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import javax.sound.midi.Soundbank;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkCommunication {
     private static final Logger logger = LoggerFactory.getLogger(NetworkCommunication.class);
 
-    private final String gameID;
-    private ClientData clientData;
+    private final GameID gameID;
+    private final ClientData clientData;
     private final WebClient baseWebClient;
 
-    public NetworkCommunication(String serverBaseURL, String gameID, ClientData clientData) {
+    public NetworkCommunication(URL serverBaseURL, GameID gameID, ClientData clientData) {
         this.gameID = gameID;
         this.clientData = clientData;
 
@@ -45,7 +44,7 @@ public class NetworkCommunication {
     public GamePlayState getGameState() {
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.GET)
-                .uri("/" + gameID + "/states/" + clientData.getPlayerID()).retrieve().bodyToMono(ResponseEnvelope.class);
+                .uri("/" + gameID.id() + "/states/" + clientData.getPlayerID()).retrieve().bodyToMono(ResponseEnvelope.class);
 
         ResponseEnvelope<GameState> requestResult = webAccess.block();
 
@@ -113,7 +112,7 @@ public class NetworkCommunication {
 
         PlayerHalfMap playerHalfMap = new PlayerHalfMap(clientData.getPlayerID(), clientMapToSend);
 
-        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID + "/halfmaps")
+        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/halfmaps")
                 .body(BodyInserters.fromValue(playerHalfMap)) // specify the data which is sent to the server
                 .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
 
@@ -134,7 +133,7 @@ public class NetworkCommunication {
                                                                 clientData.getStudentLastName(),
                                                                 clientData.getStudentUAccount());
 
-        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID + "/players")
+        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/players")
                 .body(BodyInserters.fromValue(playerReg)) // specify the data which is sent to the server
                 .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
 
@@ -185,7 +184,7 @@ public class NetworkCommunication {
         PlayerMove playerMove = PlayerMove.of(clientData.getPlayerID(), moveToSend);
 
 
-        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID + "/moves")
+        Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/moves")
                 .body(BodyInserters.fromValue(playerMove)) // specify the data which is sent to the server
                 .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
 
