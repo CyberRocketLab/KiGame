@@ -1,28 +1,47 @@
 package model.data;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class GameMap {
-    private List<Field> map = new ArrayList<>();
+    private static final Logger logger = LoggerFactory.getLogger(GameMap.class);
+    private final List<Field> fields;
     private int edgeOfX;
     private int edgeOfY;
 
-    public GameMap(List<Field> map) {
-        List<Integer> position = map.stream().map(Field::getPositionX).toList();
-        edgeOfX = 9;
-        edgeOfY = 9;
+    private static final int SQUARE_EDGE_X = 9;
+    private static final int SQUARE_EDGE_Y = 9;
+    private static final int RECTANGLE_EDGE_X = 19;
+    private static final int RECTANGLE_EDGE_Y = 4;
 
-        if(position.contains(19)) {
-            edgeOfX = 19;
-            edgeOfY = 4;
+
+    public GameMap(List<Field> fields) {
+        if (fields == null || fields.isEmpty()) {
+            logger.error("Map initialization failed: input list is null or empty");
+            throw new IllegalArgumentException("Map cannot be null or empty");
         }
 
-        this.map = map;
+        this.fields = fields;
+        setEdges();
+    }
+
+    private void setEdges() {
+        boolean isRectangleMap = fields.stream()
+                .anyMatch(field -> field.getPositionX() == RECTANGLE_EDGE_X);
+
+        if(isRectangleMap) {
+            edgeOfX = RECTANGLE_EDGE_X;
+            edgeOfY = RECTANGLE_EDGE_Y;
+        } else {
+            edgeOfX = SQUARE_EDGE_X;
+            edgeOfY = SQUARE_EDGE_Y;
+        }
     }
 
     public List<Field> getMap() {
-        return map;
+        return fields;
     }
 
     public int getEdgeOfX() {
