@@ -9,7 +9,7 @@ import model.data.Field;
 import model.data.GameID;
 import model.state.ClientState;
 import model.state.FortState;
-import model.state.GamePlayState;
+import model.state.GameState;
 import move.EMoves;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,26 +40,26 @@ public class NetworkCommunication {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE).build();
     }
 
-    public GamePlayState getGameState() {
+    public GameState getGameState() {
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.GET)
                 .uri("/" + gameID.id() + "/states/" + clientData.getPlayerID())
                 .retrieve()
                 .bodyToMono(ResponseEnvelope.class);
 
-        ResponseEnvelope<GameState> requestResult = webAccess.block();
+        ResponseEnvelope<messagesbase.messagesfromserver.GameState> requestResult = webAccess.block();
 
         if (requestResult.getState() == ERequestState.Error) {
             System.err.println("Client error, errormessage: " + requestResult.getExceptionMessage());
         }
 
-        GameState gameState = requestResult.getData().get();
+        messagesbase.messagesfromserver.GameState gameState = requestResult.getData().get();
         PlayerState playerState = gameState.getPlayers().stream()
                         .filter(player -> player.getUniquePlayerID().equals(clientData.getPlayerID()))
                         .findAny()
                         .orElse(null);
 
-        GamePlayState gamePlayState = new GamePlayState();
+        GameState gamePlayState = new GameState();
         assert playerState != null;
         gamePlayState.addClientState(playerState.getState(), playerState.hasCollectedTreasure());
 

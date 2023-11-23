@@ -2,17 +2,9 @@ package client.main;
 
 import controller.ClientController;
 import model.data.*;
-import model.generator.GameMapGenerator;
-import model.state.FortState;
-import move.Graph;
-import move.Node;
-import org.springframework.boot.web.server.GracefulShutdownCallback;
-import view.GameStateView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 
 import static java.lang.Thread.sleep;
 

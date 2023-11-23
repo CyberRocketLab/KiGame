@@ -1,7 +1,6 @@
 package view;
 
 import model.data.Field;
-import model.data.FieldCompare;
 import model.data.GameMap;
 import model.state.FortState;
 import model.state.PlayerPositionState;
@@ -9,12 +8,8 @@ import model.state.TreasureState;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
-public class GameStateView implements PropertyChangeListener {
+public class GameView implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("map".equals(evt.getPropertyName())) {

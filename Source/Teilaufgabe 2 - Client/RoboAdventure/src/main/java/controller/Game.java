@@ -11,7 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 
-public class GameState {
+public class Game {
     private GameMap map;
     private Boolean treasureFound = false;
     private Boolean fortFound = false;

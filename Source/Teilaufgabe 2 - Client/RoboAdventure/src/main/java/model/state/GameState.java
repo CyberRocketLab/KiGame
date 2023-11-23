@@ -7,18 +7,14 @@ import messagesbase.messagesfromserver.EPlayerPositionState;
 import messagesbase.messagesfromserver.ETreasureState;
 import model.data.Field;
 import model.data.Terrain;
-import org.springframework.boot.env.EnvironmentPostProcessorApplicationListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GamePlayState {
+public class GameState {
     private ClientState clientState = ClientState.MustWait;
     private List<Field> updatedMap = new ArrayList<>();
     boolean collectedTreasure = false;
-
-    public GamePlayState() {
-    }
 
     public void addFieldToMap(int posX,
                               int posY,

@@ -5,7 +5,7 @@ import model.data.Field;
 import model.data.GameID;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
-import model.state.GamePlayState;
+import model.state.GameState;
 import model.validator.MapValidator;
 import move.EMoves;
 import move.Move;
@@ -15,20 +15,21 @@ import network.NetworkCommunication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import strategy.*;
-import view.GameStateView;
+import view.GameView;
 
 import java.net.URL;
 import java.util.*;
 
 public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
-    GameState game = new GameState();
-    GameStateView gameView;
+    Game game;
+    GameView gameView;
     NetworkCommunication networkCommunication;
 
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
         networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
-        gameView = new GameStateView();
+        game = new Game();
+        gameView = new GameView();
         game.addPropertyChangeListener(gameView);
     }
 
@@ -39,8 +40,8 @@ public class ClientController {
         Queue<strategy.MoveStrategy> moveStrategies = setStrategies();
         Queue<strategy.MoveStrategy> findBurgStrategy = setStrategies();
 
-        GamePlayState gamePlayState = getGamePlayState();
-        game.updateMap(gamePlayState.getUpdatedMap());
+        GameState gameState = getGamePlayState();
+        game.updateMap(gameState.getUpdatedMap());
 
         Node startPosition = null;
         boolean startIsSet = false;
@@ -53,9 +54,9 @@ public class ClientController {
             logger.debug("Entering While loop");
 
             // Stop game if LOST or WON
-            if(gamePlayState.getClientState() == ClientState.Lost || gamePlayState.getClientState() == ClientState.Won) {
+            if(gameState.getClientState() == ClientState.Lost || gameState.getClientState() == ClientState.Won) {
                 isPlaying = false;
-                logger.debug("Game: {}", gamePlayState.getClientState());
+                logger.debug("Game: {}", gameState.getClientState());
                 continue;
             }
 
@@ -79,7 +80,7 @@ public class ClientController {
                 logger.debug("Main Strategy is done. Moving to Plan B strategy!");
             }
 
-            boolean isTreasureCollected = gamePlayState.isCollectedTreasure();
+            boolean isTreasureCollected = gameState.isCollectedTreasure();
             Node nextFieldToCheck;
 
             if (game.isTreasureFound() && !isTreasureCollected) {
@@ -90,7 +91,7 @@ public class ClientController {
                 move.setMovesToTargetField(treasureNode);
 
             } else if (isTreasureCollected && game.isFortFound()) {
-                logger.debug("Treasure is collected and Fort has been foung!");
+                logger.debug("Treasure is collected and Fort has been found!");
                 Node fortNode = move.findNode(game.getFortField());
 
                 logger.debug("Position of Treasure {}{}.", fortNode.field.getPositionX(), fortNode.field.getPositionY());
@@ -110,7 +111,7 @@ public class ClientController {
             List<EMoves> movesToTarget = move.getMoves();
 
 
-            while(gamePlayState.getClientState() != ClientState.Lost || gamePlayState.getClientState() != ClientState.Won) {
+            while(gameState.getClientState() != ClientState.Lost || gameState.getClientState() != ClientState.Won) {
                 if(movesToTarget.isEmpty()) {
                     logger.debug("The List with moves is empty");
                     break;
@@ -131,9 +132,9 @@ public class ClientController {
                 }
 
                 sendMoveToServer(movesToTarget.remove(0));
-                gamePlayState = getGamePlayState();
+                gameState = getGamePlayState();
 
-                game.updateMap(gamePlayState.getUpdatedMap());
+                game.updateMap(gameState.getUpdatedMap());
             }
 
             logger.debug("End of WhileLoop!");
@@ -178,7 +179,7 @@ public class ClientController {
         networkCommunication.sendClientMap(map);
     }
 
-    private GamePlayState getGamePlayState() {
+    private GameState getGamePlayState() {
         return networkCommunication.getGameState();
     }
 
