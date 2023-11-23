@@ -26,21 +26,19 @@ public class GameState {
     }
 
     public void updateMap(List<Field> updatedMap) {
-        Collections.sort(updatedMap, new FieldCompare());
+        updatedMap.sort(new FieldCompare());
 
-        // TODO: set Field as visited here
         GameMap beforeChange = this.map;
         this.map = new GameMap(updatedMap);
 
         Field foundTreasure = updatedMap.stream()
                 .filter(field -> field.getTreasureState() == TreasureState.GoalTreasure)
-                        .findFirst().orElse(null);
+                .findFirst().orElse(null);
 
         Field foundFort = updatedMap.stream()
                 .filter(field -> field.getFortState() == FortState.EnemyFort)
                 .findFirst().orElse(null);
 
-        // Setting Current position as visited and adding it to the list
         setFieldsToVisible(updatedMap);
 
         if(foundTreasure != null) {
@@ -80,7 +78,6 @@ public class GameState {
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        //enables to register new listeners
         changes.addPropertyChangeListener(listener);
     }
 

@@ -11,13 +11,6 @@ import java.util.Stack;
 
 public class MapValidator {
     private final List<Field> mapToValidate = new ArrayList<>();
-    private final int maxRows;
-    private final int maxCol;
-
-    public MapValidator(int maxRows, int maxCol) {
-        this.maxRows = maxRows;
-        this.maxCol = maxCol;
-    }
 
     public boolean validateMap(List<Field> originalMap) {
         for (Field field : originalMap) {
@@ -25,6 +18,8 @@ public class MapValidator {
         }
 
         // Initialising matrix with maxRows and maxCol
+        int maxRows = 5;
+        int maxCol = 10;
         Field[][] matrix = new Field[maxRows][maxCol];
 
         for (Field field : mapToValidate) {

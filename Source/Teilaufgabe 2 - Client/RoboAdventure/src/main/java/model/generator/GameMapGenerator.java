@@ -13,7 +13,9 @@ import java.util.Random;
 
 public class GameMapGenerator {
 
-    public static List<Field> generateRandomMap(int maxRows, int maxColumns) {
+    public static List<Field> generateRandomMap() {
+        int maxRows = 5;
+        int maxColumns = 10;
 
         List<Field> map = new ArrayList<>();
         boolean fortExists = false;

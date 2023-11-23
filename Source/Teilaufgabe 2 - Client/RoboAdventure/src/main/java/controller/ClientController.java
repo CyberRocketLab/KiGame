@@ -3,7 +3,6 @@ package controller;
 import model.data.ClientData;
 import model.data.Field;
 import model.data.GameID;
-import model.data.GameMap;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
 import model.state.GamePlayState;
@@ -23,39 +22,25 @@ import java.util.*;
 
 public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
-    GameState gamePlay = new GameState();
-    GameStateView gameStateView;
+    GameState game = new GameState();
+    GameStateView gameView;
     NetworkCommunication networkCommunication;
 
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
         networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
-        gameStateView = new GameStateView();
-        gamePlay.addPropertyChangeListener(gameStateView);
+        gameView = new GameStateView();
+        game.addPropertyChangeListener(gameView);
     }
 
     public synchronized void play() {
-        // Starting & Registering Game
         registerClient();
         sendClientMap();
 
-
-        Queue<strategy.MoveStrategy> moveStrategies = new LinkedList<>();
-        moveStrategies.add(new RightCornerDown());
-        moveStrategies.add(new RightCornerUp());
-        moveStrategies.add(new LeftCornerDown());
-        moveStrategies.add(new LeftCornerUp());
-
-        Queue<strategy.MoveStrategy> findBurgStrategy = new LinkedList<>();
-        findBurgStrategy.add(new RightCornerDown());
-        findBurgStrategy.add(new RightCornerUp());
-        findBurgStrategy.add(new LeftCornerDown());
-        findBurgStrategy.add(new LeftCornerUp());
-
+        Queue<strategy.MoveStrategy> moveStrategies = setStrategies();
+        Queue<strategy.MoveStrategy> findBurgStrategy = setStrategies();
 
         GamePlayState gamePlayState = getGamePlayState();
-        gamePlay.updateMap(gamePlayState.getUpdatedMap());
-      //  Move move = new Move(gamePlay.getMap().getMap()); // TODO: Fix this shit
-       // NextFieldToCheck nextFieldFinder = new NextFieldToCheck(gamePlay.getMap(), move.getNodeList());
+        game.updateMap(gamePlayState.getUpdatedMap());
 
         Node startPosition = null;
         boolean startIsSet = false;
@@ -66,41 +51,25 @@ public class ClientController {
         boolean isPlaying = true;
         while (isPlaying) {
             logger.debug("Entering While loop");
-            // Receiving the latest updates from Server
-        //    GamePlayState gamePlayState = getGamePlayState();
 
-            // Stop game if lost
+            // Stop game if LOST or WON
             if(gamePlayState.getClientState() == ClientState.Lost || gamePlayState.getClientState() == ClientState.Won) {
                 isPlaying = false;
                 logger.debug("Game: {}", gamePlayState.getClientState());
                 continue;
             }
 
-            Move move = new Move(gamePlay.getMap().getMap()); // TODO: Fix this shit
+            Move move = new Move(game.getMap().getMap()); // TODO: Fix this shit
 
             if(!startIsSet) {
                 startPosition = move.getPlayerPosition();
                 startIsSet = true;
             }
 
-            NextFieldToCheck nextFieldFinder = new NextFieldToCheck(gamePlay.getMap(), move.getNodeList(), startPosition);
-
-        /*    // Updating GameMap
-            gamePlay.updateMap(gamePlayState.getUpdatedMap());
-
-            // Setting Move object with PlayerPosition as source Node
-            Move move = new Move(gamePlay.getMap().getMap()); // TODO: Fix this shit
-
-            // Getting the nextField to check
-            NextFieldToCheck nextFieldFinder = new NextFieldToCheck(gamePlay.getMap(), move.getNodeList());*/
+            NextFieldToCheck nextFieldFinder = new NextFieldToCheck(game.getMap(), move.getNodeList(), startPosition);
 
 
             if(moveStrategies.isEmpty()) {
-               /* moveStrategies.add(new RightCornerDown());
-                moveStrategies.add(new RightCornerUp());
-                moveStrategies.add(new LeftCornerDown());
-                moveStrategies.add(new LeftCornerUp());*/
-
                 moveStrategies.add(new CheckUnvisitedFields());
                 logger.debug("Main Strategy is done. Moving to Plan B strategy!");
             }
@@ -111,19 +80,18 @@ public class ClientController {
             }
 
             boolean isTreasureCollected = gamePlayState.isCollectedTreasure();
-           // Node nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(moveStrategies.poll(), isTreasureCollected);
             Node nextFieldToCheck;
 
-            if (gamePlay.isTreasureFound() && !isTreasureCollected) {
+            if (game.isTreasureFound() && !isTreasureCollected) {
                 logger.debug("Treasure has been found but not collected, setting next move towards the treasure");
-                Node treasureNode = move.findNode(gamePlay.getTreasureField());
+                Node treasureNode = move.findNode(game.getTreasureField());
 
                 logger.debug("Position of Treasure {}{}.", treasureNode.field.getPositionX(), treasureNode.field.getPositionY());
                 move.setMovesToTargetField(treasureNode);
 
-            } else if (isTreasureCollected && gamePlay.isFortFound()) {
+            } else if (isTreasureCollected && game.isFortFound()) {
                 logger.debug("Treasure is collected and Fort has been foung!");
-                Node fortNode = move.findNode(gamePlay.getFortField());
+                Node fortNode = move.findNode(game.getFortField());
 
                 logger.debug("Position of Treasure {}{}.", fortNode.field.getPositionX(), fortNode.field.getPositionY());
                 move.setMovesToTargetField(fortNode);
@@ -139,9 +107,6 @@ public class ClientController {
                 move.setMovesToTargetField(nextFieldToCheck);
             }
 
-
-            // Setting Moves to Target
-           // move.setMovesToTargetField(nextFieldToCheck);
             List<EMoves> movesToTarget = move.getMoves();
 
 
@@ -152,14 +117,14 @@ public class ClientController {
                 }
 
                 if(!treasureFoundOnce) {
-                    if (gamePlay.isTreasureFound()) {
+                    if (game.isTreasureFound()) {
                         treasureFoundOnce = true;
                         break;
                     }
                 }
 
                 if (!burgFoundOnce) {
-                    if(gamePlay.isFortFound()) {
+                    if(game.isFortFound()) {
                         burgFoundOnce = true;
                         break;
                     }
@@ -168,7 +133,7 @@ public class ClientController {
                 sendMoveToServer(movesToTarget.remove(0));
                 gamePlayState = getGamePlayState();
 
-                gamePlay.updateMap(gamePlayState.getUpdatedMap());
+                game.updateMap(gamePlayState.getUpdatedMap());
             }
 
             logger.debug("End of WhileLoop!");
@@ -179,45 +144,45 @@ public class ClientController {
 
     }
 
-    public void registerClient() {
+    private void registerClient() {
         networkCommunication.registerClient();
     }
 
-    public List<Field> generateHalfMap(){
-        int maxRows = 5;
-        int maxColumns = 10;
+    private List<Field> generateHalfMap(){
+        List<Field> randomMap = GameMapGenerator.generateRandomMap();
 
-       /* GameMapGenerator gameMap = new GameMapGenerator();
-        gameMap.generateRandomMap(maxRows, maxColumns);
-
-        MapValidator mapValidator = new MapValidator(maxRows, maxColumns);
-
-        while (!mapValidator.validateMap(gameMap.getMap())) {
-            gameMap.generateRandomMap(maxRows, maxColumns);
-        }
-
-        return gameMap.getMap();*/
-
-        List<Field> randomMap = GameMapGenerator.generateRandomMap(maxRows,maxColumns);
-        MapValidator mapValidator = new MapValidator(maxRows, maxColumns);
-
-        while (!mapValidator.validateMap(randomMap)) {
-            randomMap = GameMapGenerator.generateRandomMap(maxRows,maxColumns);
+        while (!validateMap(randomMap)) {
+            randomMap = GameMapGenerator.generateRandomMap();
         }
 
         return randomMap;
     }
 
-    public  void sendClientMap() {
+    private Queue<MoveStrategy> setStrategies() {
+        Queue<MoveStrategy> moveStrategies = new LinkedList<>();
+        moveStrategies.add(new RightCornerDown());
+        moveStrategies.add(new RightCornerUp());
+        moveStrategies.add(new LeftCornerDown());
+        moveStrategies.add(new LeftCornerUp());
+
+        return moveStrategies;
+    }
+
+    private boolean validateMap(List<Field> randomMap) {
+        MapValidator mapValidator = new MapValidator();
+        return mapValidator.validateMap(randomMap);
+    }
+
+    private   void sendClientMap() {
         List<Field> map = generateHalfMap();
         networkCommunication.sendClientMap(map);
     }
 
-    public GamePlayState getGamePlayState() {
+    private GamePlayState getGamePlayState() {
         return networkCommunication.getGameState();
     }
 
-    public void sendMoveToServer(EMoves move) {
+    private void sendMoveToServer(EMoves move) {
         networkCommunication.sendMove(move);
     }
 
