@@ -3,6 +3,7 @@ package controller;
 import model.data.ClientData;
 import model.data.Field;
 import model.data.GameID;
+import model.data.GameMap;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
 import model.state.GamePlayState;
@@ -186,7 +187,7 @@ public class ClientController {
         int maxRows = 5;
         int maxColumns = 10;
 
-        GameMapGenerator gameMap = new GameMapGenerator();
+       /* GameMapGenerator gameMap = new GameMapGenerator();
         gameMap.generateRandomMap(maxRows, maxColumns);
 
         MapValidator mapValidator = new MapValidator(maxRows, maxColumns);
@@ -195,7 +196,16 @@ public class ClientController {
             gameMap.generateRandomMap(maxRows, maxColumns);
         }
 
-        return gameMap.getMap();
+        return gameMap.getMap();*/
+
+        List<Field> randomMap = GameMapGenerator.generateRandomMap(maxRows,maxColumns);
+        MapValidator mapValidator = new MapValidator(maxRows, maxColumns);
+
+        while (!mapValidator.validateMap(randomMap)) {
+            randomMap = GameMapGenerator.generateRandomMap(maxRows,maxColumns);
+        }
+
+        return randomMap;
     }
 
     public  void sendClientMap() {

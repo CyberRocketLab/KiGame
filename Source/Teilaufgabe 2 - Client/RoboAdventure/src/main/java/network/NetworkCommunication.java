@@ -26,7 +26,6 @@ import java.util.List;
 
 public class NetworkCommunication {
     private static final Logger logger = LoggerFactory.getLogger(NetworkCommunication.class);
-
     private final GameID gameID;
     private final ClientData clientData;
     private final WebClient baseWebClient;
@@ -35,16 +34,18 @@ public class NetworkCommunication {
         this.gameID = gameID;
         this.clientData = clientData;
 
-        baseWebClient = WebClient.builder().baseUrl(serverBaseURL + "/games")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE) // the network protocol uses
-                // XML
+        baseWebClient = WebClient.builder()
+                .baseUrl(serverBaseURL + "/games")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE).build();
     }
 
     public GamePlayState getGameState() {
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.GET)
-                .uri("/" + gameID.id() + "/states/" + clientData.getPlayerID()).retrieve().bodyToMono(ResponseEnvelope.class);
+                .uri("/" + gameID.id() + "/states/" + clientData.getPlayerID())
+                .retrieve()
+                .bodyToMono(ResponseEnvelope.class);
 
         ResponseEnvelope<GameState> requestResult = webAccess.block();
 
@@ -141,11 +142,6 @@ public class NetworkCommunication {
 
 
         if (resultReg.getState() == ERequestState.Error) {
-            // typically happens if you forgot to create a new game before the client
-            // execution or forgot to adapt the run configuration so that it supplies
-            // the id of the new game to the client
-            // open http://swe1.wst.univie.ac.at:18235/games in your browser to create a new
-            // game and obtain its game id
             System.err.println("Client error, errormessage: " + resultReg.getExceptionMessage());
         } else {
             UniquePlayerIdentifier uniqueID = resultReg.getData().get();
@@ -185,8 +181,8 @@ public class NetworkCommunication {
 
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/moves")
-                .body(BodyInserters.fromValue(playerMove)) // specify the data which is sent to the server
-                .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
+                .body(BodyInserters.fromValue(playerMove))
+                .retrieve().bodyToMono(ResponseEnvelope.class);
 
 
 

@@ -9,9 +9,10 @@ public class GameMap {
     private int edgeOfY;
 
     public GameMap(List<Field> map) {
-        List<Integer> position = map.stream().map(Field::getPositionX).collect(Collectors.toList());
+        List<Integer> position = map.stream().map(Field::getPositionX).toList();
         edgeOfX = 9;
         edgeOfY = 9;
+
         if(position.contains(19)) {
             edgeOfX = 19;
             edgeOfY = 4;
@@ -28,15 +29,8 @@ public class GameMap {
         return edgeOfX;
     }
 
-    public void setEdgeOfX(int edgeOfX) {
-        this.edgeOfX = edgeOfX;
-    }
-
     public int getEdgeOfY() {
         return edgeOfY;
     }
 
-    public void setEdgeOfY(int edgeOfY) {
-        this.edgeOfY = edgeOfY;
-    }
 }

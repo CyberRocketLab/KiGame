@@ -5,7 +5,6 @@ public class ClientData {
     private final String studentLastName;
     private final String studentUAccount;
     private String PlayerID;
-    private String GameID;
 
 
     public ClientData(String studentFirstName, String studentLastName, String studentUAccount) {
@@ -30,14 +29,7 @@ public class ClientData {
         return PlayerID;
     }
 
-    public String getGameID() {
-        return GameID;
-    }
     public void setPlayerID(String playerID) {
         PlayerID = playerID;
-    }
-
-    public void setGameID(String gameID) {
-        GameID = gameID;
     }
 }

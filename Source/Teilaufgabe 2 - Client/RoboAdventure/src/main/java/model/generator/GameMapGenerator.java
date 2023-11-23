@@ -12,49 +12,20 @@ import java.util.List;
 import java.util.Random;
 
 public class GameMapGenerator {
-    private final List<Field> map = new ArrayList<>();
 
-    public GameMapGenerator() {
-    }
+    public static List<Field> generateRandomMap(int maxRows, int maxColumns) {
 
-    public void generateRandomMap(int maxRows, int maxColumns) {
-        List<Terrain> terrainList = new ArrayList<>();
+        List<Field> map = new ArrayList<>();
         boolean fortExists = false;
 
-        // If Map was generated WRONG the Map will be erased
-        if (!map.isEmpty()) {
-            map.clear();
-        }
-
-        // Allowed percent of Fields in the map
-        double percentOfWater = 0.14;
-        double percentOfGrass = 0.6;
-        double percentOfMountain = 0.26;
-        int totalQuantityOfFields = 50;
-
-        // Calculating exact amount of each Field in the Map
-        int water = (int) (totalQuantityOfFields * percentOfWater);
-        int grass = (int) (totalQuantityOfFields * percentOfGrass);
-        int mountain = (int) (totalQuantityOfFields * percentOfMountain);
-
-        for (int i = 0; i < water; ++i) {
-            terrainList.add(Terrain.WATER);
-        }
-
-        for (int i = 0; i < grass; ++i) {
-            terrainList.add(Terrain.GRASS);
-        }
-
-        for (int i = 0; i < mountain; ++i) {
-            terrainList.add(Terrain.MOUNTAIN);
-        }
-
+        List<Terrain> terrainList = calculatingAmountOfTerrains(maxRows, maxColumns);
         Collections.shuffle(terrainList, new Random());
 
-
+        int firstTerrain = 0;
         for (int posY = 0; posY < maxRows; ++posY) {
             for (int posX = 0; posX < maxColumns; ++posX) {
-                Terrain randomTerrain = terrainList.remove(0);
+
+                Terrain randomTerrain = terrainList.remove(firstTerrain);
 
                 if(!fortExists && randomTerrain == Terrain.GRASS) {
                     Field field = new Field(
@@ -83,9 +54,37 @@ public class GameMapGenerator {
                 map.add(field);
             }
         }
-    }
 
-    public List<Field> getMap() {
         return map;
     }
+
+    private static List<Terrain> calculatingAmountOfTerrains(int maxRows, int maxColumns) {
+        List<Terrain> terrainList = new ArrayList<>();
+
+        // Allowed percent of Fields in the map
+        double percentOfWater = 0.14;
+        double percentOfGrass = 0.6;
+        double percentOfMountain = 0.26;
+        int totalQuantityOfFields = maxRows * maxColumns;
+
+        // Calculating exact amount of each Field in the Map
+        int amountOfWater = (int) (totalQuantityOfFields * percentOfWater);
+        int amountOfGrass = (int) (totalQuantityOfFields * percentOfGrass);
+        int amountOfMountain = (int) (totalQuantityOfFields * percentOfMountain);
+
+        for (int i = 0; i < amountOfWater; ++i) {
+            terrainList.add(Terrain.WATER);
+        }
+
+        for (int i = 0; i < amountOfGrass; ++i) {
+            terrainList.add(Terrain.GRASS);
+        }
+
+        for (int i = 0; i < amountOfMountain; ++i) {
+            terrainList.add(Terrain.MOUNTAIN);
+        }
+
+        return terrainList;
+    }
+
 }
