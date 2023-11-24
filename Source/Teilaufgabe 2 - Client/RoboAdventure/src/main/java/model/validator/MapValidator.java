@@ -1,5 +1,6 @@
 package model.validator;
 
+import exceptions.MapBusinessRuleException;
 import model.position.Position;
 import model.data.Field;
 import model.data.Terrain;
@@ -7,20 +8,30 @@ import model.state.PlayerPositionState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
 public class MapValidator {
-    private final List<Field> mapToValidate = new ArrayList<>();
+    private static final int ROWS = 5;
+    private static final int COLUMNS = 10;
 
     public boolean validateMap(List<Field> originalMap) {
+        if (originalMap == null || originalMap.isEmpty()) {
+            throw new MapBusinessRuleException("The map is empty or null");
+        }
+
+        if (!validateBusinessRules(originalMap)) {
+            return false;
+        }
+
+        // Creating deep copy with purpose not to change original map
+        List<Field> mapToValidate = new ArrayList<>();
+
         for (Field field : originalMap) {
             mapToValidate.add(new Field(field));
         }
 
-        // Initialising matrix with maxRows and maxCol
-        int maxRows = 5;
-        int maxCol = 10;
-        Field[][] matrix = new Field[maxRows][maxCol];
+        Field[][] matrix = new Field[ROWS][COLUMNS];
 
         for (Field field : mapToValidate) {
             matrix[field.getPositionY()][field.getPositionX()] = field;
@@ -28,16 +39,8 @@ public class MapValidator {
 
         // Creating Stack with start Position
         Stack<Position> stack = new Stack<>();
-        int horX = 0;
-        int vertY = 0;
-
-        // If Start Position (0,0) is on WATTER peek random position what is not on WATTER
-        while (matrix[vertY][horX].getTerrain() == Terrain.WATER) {
-            vertY = (int) (Math.random() * maxRows);
-            horX = (int) (Math.random() * maxCol);
-        }
-
-        stack.push(new Position(horX,vertY));
+        Optional<Position> nonWaterPosition = getFirstNonWaterField(mapToValidate);
+        nonWaterPosition.ifPresent(stack::push);
 
         while (!stack.empty()) {
             Position currentFieldPosition = stack.pop();
@@ -50,34 +53,75 @@ public class MapValidator {
                 continue;
             }
 
-            // Field that was discovered are marked as PlayerPositionState.VISITED
             currentField.setPlayerPositionState(PlayerPositionState.VISITED);
 
-            // Push Field to Stack that is RIGHT from current Field
-            if (horizontalX + 1 < maxCol && matrix[verticalY][horizontalX + 1].getPlayerPositionState() != PlayerPositionState.VISITED) {
-                stack.push(new Position(horizontalX + 1,verticalY));
+            for (Position position : getAdjacentFieldsPosition(horizontalX, verticalY, matrix)) {
+                stack.push(position);
             }
-
-            // Push Field to Stack that is LEFT from current Field
-            if (horizontalX - 1 >= 0 && matrix[verticalY][horizontalX - 1].getPlayerPositionState() != PlayerPositionState.VISITED) {
-                stack.push(new Position(horizontalX - 1,verticalY));
-            }
-
-            // Push Field to Stack that is UP from current Field
-            if (verticalY + 1 < maxRows && matrix[verticalY +1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
-                stack.push(new Position(horizontalX,verticalY + 1));
-            }
-
-            // Push Field to Stack that is DOWN from current Field
-            if (verticalY - 1 >= 0 &&  matrix[verticalY -1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
-                stack.push(new Position(horizontalX,verticalY - 1));
-            }
-
         }
 
-        // Checking if all Fields was visited
-        for (int i = 0; i < maxRows; i++) {
-            for (int j = 0; j < maxCol; j++) {
+        return allFieldsVisited(matrix);
+    }
+
+    private boolean validateBusinessRules(List<Field> map) {
+        int minAmountOfWater = 7;
+        int minAmountOfGrass = 24;
+        int minAmountOfMountain = 5;
+
+        long countWater = map.stream()
+                .filter(field -> field.getTerrain() == Terrain.WATER)
+                .count();
+
+        long countGrass = map.stream()
+                .filter(field -> field.getTerrain() == Terrain.GRASS)
+                .count();
+
+        long countMountain = map.stream()
+                .filter(field -> field.getTerrain() == Terrain.MOUNTAIN)
+                .count();
+
+        return (countWater >= minAmountOfWater) &&
+                (countGrass >= minAmountOfGrass) &&
+                ( countMountain >= minAmountOfMountain);
+    }
+
+    private Optional<Position> getFirstNonWaterField(List<Field> mapToValidate) {
+        return mapToValidate.stream()
+                .filter(field -> field.getTerrain() != Terrain.WATER)
+                .findFirst()
+                .map(field -> new Position(field.getPositionX(), field.getPositionY()));
+    }
+
+    private List<Position> getAdjacentFieldsPosition(int horizontalX, int verticalY, Field[][] matrix) {
+        List<Position> adjacentFields= new ArrayList<>();
+
+        // Right Field from current Field
+        if (horizontalX + 1 < COLUMNS && matrix[verticalY][horizontalX + 1].getPlayerPositionState() != PlayerPositionState.VISITED) {
+            adjacentFields.add(new Position(horizontalX + 1,verticalY));
+        }
+
+        // Left Field from current Field
+        if (horizontalX - 1 >= 0 && matrix[verticalY][horizontalX - 1].getPlayerPositionState() != PlayerPositionState.VISITED) {
+            adjacentFields.add(new Position(horizontalX - 1,verticalY));
+        }
+
+        // Up Field from current Field
+        if (verticalY + 1 < ROWS && matrix[verticalY +1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
+            adjacentFields.add(new Position(horizontalX,verticalY + 1));
+        }
+
+        // Down Field from current Field
+        if (verticalY - 1 >= 0 &&  matrix[verticalY -1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
+            adjacentFields.add(new Position(horizontalX,verticalY - 1));
+        }
+
+        return adjacentFields;
+    }
+
+
+    private boolean allFieldsVisited(Field[][] matrix) {
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLUMNS; j++) {
                 if (!(matrix[i][j].getPlayerPositionState() == PlayerPositionState.VISITED) && matrix[i][j].getTerrain() != Terrain.WATER) {
                     return false;
                 }
