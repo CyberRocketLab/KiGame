@@ -160,7 +160,6 @@ public class ClientController {
     }
 
     private List<Field> generateHalfMap(){
-
         BusinessLogicInterface businessLogic = new BalancedTerrainDistributionLogic();
         GameMapGenerator mapGenerator = new GameMapGenerator(businessLogic);
 
