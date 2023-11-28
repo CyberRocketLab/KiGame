@@ -20,7 +20,6 @@ public class GameMapGenerator {
         int maxColumns = 10;
 
         List<Field> map = new ArrayList<>();
-        boolean fortExists = false;
 
         List<Terrain> terrainList = businessLogic.calculateAmountOfTerrains(maxRows, maxColumns);
 
@@ -29,23 +28,7 @@ public class GameMapGenerator {
         int firstTerrain = 0;
         for (int posY = 0; posY < maxRows; ++posY) {
             for (int posX = 0; posX < maxColumns; ++posX) {
-
                 Terrain randomTerrain = terrainList.remove(firstTerrain);
-
-                if(!fortExists && randomTerrain == Terrain.GRASS) {
-                    Field field = new Field(
-                            posX,
-                            posY,
-                            randomTerrain,
-                            PlayerPositionState.ME,
-                            TreasureState.NoTreasure,
-                            FortState.MyFort
-                    );
-
-                    fortExists = true;
-                    map.add(field);
-                    continue;
-                }
 
                 Field field = new Field(
                         posX,
@@ -60,7 +43,18 @@ public class GameMapGenerator {
             }
         }
 
+        setRandomFortPosition(map);
+
         return map;
+    }
+
+    private void setRandomFortPosition(List<Field> map) {
+        List<Field> grassFields = map.stream()
+                .filter(field -> field.getTerrain() == Terrain.GRASS)
+                .toList();
+
+        int randomPosition = (int)(Math.random() * (grassFields.size() -1));
+        grassFields.get(randomPosition).setFortState(FortState.MyFort);
     }
 
 

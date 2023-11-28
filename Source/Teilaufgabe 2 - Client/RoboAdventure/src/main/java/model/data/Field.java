@@ -12,7 +12,7 @@ public class Field {
     private final Terrain terrain;
     private PlayerPositionState playerPositionState;
     private final TreasureState treasureState;
-    private final FortState fortState;
+    private FortState fortState;
     private boolean visited = false;
 
     public Field(int positionX,
@@ -109,4 +109,7 @@ public class Field {
         this.visited = visited;
     }
 
+    public void setFortState(FortState fortState) {
+        this.fortState = fortState;
+    }
 }
