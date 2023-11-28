@@ -1,5 +1,9 @@
 package controller;
 
+import converter.ClientConverter;
+import converter.IClientConverter;
+import converter.IServerConverter;
+import converter.ServerConverter;
 import model.data.ClientData;
 import model.data.Field;
 import model.data.GameID;
@@ -29,7 +33,11 @@ public class ClientController {
     NetworkCommunication networkCommunication;
 
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
-        networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData);
+
+        IClientConverter clientConverter = new ClientConverter();
+        IServerConverter serverConverter = new ServerConverter();
+
+        networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData, clientConverter, serverConverter);
         game = new Game();
         gameView = new GameView();
         game.addPropertyChangeListener(gameView);

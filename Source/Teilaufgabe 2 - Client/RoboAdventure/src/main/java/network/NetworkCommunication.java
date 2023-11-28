@@ -1,7 +1,10 @@
 package network;
 
-import converter.Converter;
+import converter.IClientConverter;
 import converter.ClientConverter;
+import converter.IServerConverter;
+import converter.ServerConverter;
+import exceptions.NetworkException;
 import messagesbase.ResponseEnvelope;
 import messagesbase.UniquePlayerIdentifier;
 import messagesbase.messagesfromclient.*;
@@ -25,14 +28,17 @@ import reactor.core.publisher.Mono;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class NetworkCommunication {
     private static final Logger logger = LoggerFactory.getLogger(NetworkCommunication.class);
     private final GameID gameID;
     private final ClientData clientData;
     private final WebClient baseWebClient;
+    private final IClientConverter clientConverter;
+    private final IServerConverter serverConverter;
 
-    public NetworkCommunication(URL serverBaseURL, GameID gameID, ClientData clientData) {
+    public NetworkCommunication(URL serverBaseURL, GameID gameID, ClientData clientData, IClientConverter clientConverter, IServerConverter serverConverter) {
         this.gameID = gameID;
         this.clientData = clientData;
 
@@ -40,10 +46,12 @@ public class NetworkCommunication {
                 .baseUrl(serverBaseURL + "/games")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE).build();
+
+        this.clientConverter = clientConverter;
+        this.serverConverter = serverConverter;
     }
 
     public GameState getGameState() {
-
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.GET)
                 .uri("/" + gameID.id() + "/states/" + clientData.getPlayerID())
                 .retrieve()
@@ -55,34 +63,25 @@ public class NetworkCommunication {
             System.err.println("Client error, errormessage: " + requestResult.getExceptionMessage());
         }
 
-        messagesbase.messagesfromserver.GameState gameState = requestResult.getData().get();
-        PlayerState playerState = gameState.getPlayers().stream()
-                        .filter(player -> player.getUniquePlayerID().equals(clientData.getPlayerID()))
-                        .findAny()
-                        .orElse(null);
+        messagesbase.messagesfromserver.GameState serverGameState = requestResult.getData().get();
 
+        Optional<PlayerState> playerState = serverGameState.getPlayers().stream()
+                .filter(player -> player.getUniquePlayerID().equals(clientData.getPlayerID()))
+                .findFirst();
 
-        Converter converterForClient = new ClientConverter();
-        GameState gamePlayState = new GameState(converterForClient);
-        assert playerState != null;
-        gamePlayState.addClientState(playerState.getState(), playerState.hasCollectedTreasure());
+        if(playerState.isEmpty()) {
+            throw new NetworkException("PlayerState is empty");
+        }
 
+        GameState clientGameState = new GameState();
+        clientGameState.addClientState(
+                clientConverter.getConvertedClientState(playerState.get().getState()),
+                playerState.get().hasCollectedTreasure()
+        );
 
-        FullMap fullMapNodes = gameState.getMap();
+        clientGameState.addMap(clientConverter.getConvertedMap(serverGameState.getMap()));
 
-        fullMapNodes.stream().forEach(
-                node ->
-                        gamePlayState.addFieldToMap(
-                                node.getX(),
-                                node.getY(),
-                                node.getTerrain(),
-                                node.getPlayerPositionState(),
-                                node.getTreasureState(),
-                                node.getFortState()
-                        )
-                );
-
-        return gamePlayState;
+        return clientGameState;
     }
 
     public void sendClientMap(List<Field> clientMap) {
@@ -95,25 +94,9 @@ public class NetworkCommunication {
             }
         }
 
-        List<PlayerHalfMapNode> clientMapToSend = new ArrayList<>();
+        IServerConverter serverConverter = new ServerConverter();
 
-        for (Field field : clientMap) {
-                boolean fortPresent = false;
-                ETerrain terrain = null;
-
-                if (field.getFortState() == FortState.MyFort) {
-                    fortPresent = true;
-                }
-
-                terrain = switch (field.getTerrain()) {
-                    case GRASS -> ETerrain.Grass;
-                    case WATER -> ETerrain.Water;
-                    case MOUNTAIN -> ETerrain.Mountain;
-                };
-
-                clientMapToSend.add(new PlayerHalfMapNode(field.getPositionX(), field.getPositionY(), fortPresent, terrain));
-
-        }
+        List<PlayerHalfMapNode> clientMapToSend = serverConverter.convertToPlayerHalfMapNode(clientMap);
 
         PlayerHalfMap playerHalfMap = new PlayerHalfMap(clientData.getPlayerID(), clientMapToSend);
 
@@ -172,23 +155,12 @@ public class NetworkCommunication {
             }
         }
 
-        EMove moveToSend = null;
-
-        switch (move) {
-            case Up -> moveToSend = EMove.Up;
-            case Down -> moveToSend = EMove.Down;
-            case Left -> moveToSend = EMove.Left;
-            case Right -> moveToSend = EMove.Right;
-        }
-
-        PlayerMove playerMove = PlayerMove.of(clientData.getPlayerID(), moveToSend);
+        PlayerMove playerMove = PlayerMove.of(clientData.getPlayerID(), serverConverter.convertToEMove(move));
 
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/moves")
                 .body(BodyInserters.fromValue(playerMove))
                 .retrieve().bodyToMono(ResponseEnvelope.class);
-
-
 
         ResponseEnvelope result = webAccess.block();
 
@@ -199,4 +171,16 @@ public class NetworkCommunication {
         }
 
     }
+
+    private void waitForMyTurn() {
+        while (getGameState().getClientState() != ClientState.MustAct) {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
 }

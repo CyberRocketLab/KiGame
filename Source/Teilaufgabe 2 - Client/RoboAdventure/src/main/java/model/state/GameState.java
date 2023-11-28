@@ -1,6 +1,6 @@
 package model.state;
 
-import converter.Converter;
+import converter.IClientConverter;
 import messagesbase.messagesfromclient.ETerrain;
 import messagesbase.messagesfromserver.EFortState;
 import messagesbase.messagesfromserver.EPlayerGameState;
@@ -16,43 +16,13 @@ public class GameState {
     private List<Field> updatedMap = new ArrayList<>();
     boolean collectedTreasure = false;
 
-    private final Converter converterForClient;
-
-    public GameState(Converter converter) {
-        this.converterForClient = converter;
+    public void addMap(List<Field> serverMap) {
+        updatedMap = serverMap;
     }
 
-    public void addFieldToMap(int posX,
-                              int posY,
-                              ETerrain eTerrain,
-                              EPlayerPositionState ePlayerPositionState,
-                              ETreasureState eTreasureStatetreasureState,
-                              EFortState eFortStatefortState)
-    {
-       Field field = new Field(
-               posX,
-               posY,
-               converterForClient.getConvertedTerrain(eTerrain),
-               converterForClient.getConvertedPlayerPositionState(ePlayerPositionState),
-               converterForClient.getConvertedTreasureState(eTreasureStatetreasureState),
-               converterForClient.getConvertedFortState(eFortStatefortState)
-       );
-
-
-        updatedMap.add(field);
-
-    }
-
-    public void addClientState(EPlayerGameState ePlayerGameState, boolean hasCollectedTreasure) {
-        clientState = switch (ePlayerGameState) {
-            case Won -> ClientState.Won;
-            case Lost -> ClientState.Lost;
-            case MustAct -> ClientState.MustAct;
-            case MustWait -> ClientState.MustWait;
-        };
-
+    public void addClientState(ClientState clientState, boolean hasCollectedTreasure) {
+        this.clientState = clientState;
         this.collectedTreasure = hasCollectedTreasure;
-
     }
 
     public ClientState getClientState() {

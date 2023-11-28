@@ -34,9 +34,4 @@ public class MainGame {
 
 
     }
-
-    private static boolean validateMap(List<Field> randomMap) {
-        MapValidator mapValidator = new MapValidator();
-        return mapValidator.validateMap(randomMap);
-    }
 }
