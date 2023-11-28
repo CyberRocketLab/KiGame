@@ -37,6 +37,11 @@ public class MapValidator {
             matrix[field.getPositionY()][field.getPositionX()] = field;
         }
 
+        if (!isAllowedAmountOfWaterOnEdges(matrix)) {
+            System.out.println("Not Allowed Water on egdes");
+            return false;
+        }
+
         // Creating Stack with start Position
         Stack<Position> stack = new Stack<>();
         Optional<Position> nonWaterPosition = getFirstNonWaterField(mapToValidate);
@@ -83,6 +88,38 @@ public class MapValidator {
         return (countWater >= minAmountOfWater) &&
                 (countGrass >= minAmountOfGrass) &&
                 ( countMountain >= minAmountOfMountain);
+    }
+
+    private boolean isAllowedAmountOfWaterOnEdges(Field[][] matrix) {
+        int shortEdgeMaxWater = 2;
+        int longEdgeMaxWater = 4;
+
+        int topEdgeWater = 0;
+        int bottomEdgeWater = 0;
+        for(int x = 0; x < COLUMNS; ++x) {
+            if(matrix[0][x].getTerrain() == Terrain.WATER) {
+                ++topEdgeWater;
+            }
+            if(matrix[4][x].getTerrain() == Terrain.WATER) {
+                ++bottomEdgeWater;
+            }
+        }
+
+        int leftEdgeWater = 0;
+        int rightEdgeWater = 0;
+        for (int y = 0; y < ROWS; y++) {
+            if (matrix[y][0].getTerrain() == Terrain.WATER) {
+                ++leftEdgeWater;
+            }
+            if (matrix[y][9].getTerrain() == Terrain.WATER) {
+                ++rightEdgeWater;
+            }
+        }
+
+        return topEdgeWater <= longEdgeMaxWater &&
+                bottomEdgeWater <= longEdgeMaxWater &&
+                leftEdgeWater <= shortEdgeMaxWater &&
+                rightEdgeWater <= shortEdgeMaxWater;
     }
 
     private Optional<Position> getFirstNonWaterField(List<Field> mapToValidate) {
