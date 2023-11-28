@@ -3,6 +3,8 @@ package controller;
 import model.data.ClientData;
 import model.data.Field;
 import model.data.GameID;
+import model.generator.BalancedTerrainDistributionLogic;
+import model.generator.BusinessLogicInterface;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
 import model.state.GameState;
@@ -150,10 +152,14 @@ public class ClientController {
     }
 
     private List<Field> generateHalfMap(){
-        List<Field> randomMap = GameMapGenerator.generateRandomMap();
+
+        BusinessLogicInterface businessLogic = new BalancedTerrainDistributionLogic();
+        GameMapGenerator mapGenerator = new GameMapGenerator(businessLogic);
+
+        List<Field> randomMap = mapGenerator.generateRandomMap();
 
         while (!validateMap(randomMap)) {
-            randomMap = GameMapGenerator.generateRandomMap();
+            randomMap = mapGenerator.generateRandomMap();
         }
 
         return randomMap;
@@ -174,7 +180,7 @@ public class ClientController {
         return mapValidator.validateMap(randomMap);
     }
 
-    private   void sendClientMap() {
+    private void sendClientMap() {
         List<Field> map = generateHalfMap();
         networkCommunication.sendClientMap(map);
     }

@@ -108,4 +108,5 @@ public class Field {
     public void setVisited(boolean visited) {
         this.visited = visited;
     }
+
 }

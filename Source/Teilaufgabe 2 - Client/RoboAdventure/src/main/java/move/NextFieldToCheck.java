@@ -27,16 +27,10 @@ public class NextFieldToCheck {
         int edgeOfY = map.getEdgeOfY();
         this.nodeList = nodeList;
 
-        /*Node startPosition = nodeList.stream()
-                .filter(node -> node.field.getPlayerPositionState() == PlayerPositionState.ME)
-                .findFirst().orElseThrow();
-                */
-
         int myHalfStartX;
         int myHalfEndX;
         int myHalfStartY;
         int myHalfEndY;
-
 
         if (edgeOfX > edgeOfY) {
             // Horizontal map (5x20)
@@ -75,60 +69,6 @@ public class NextFieldToCheck {
         logger.debug("My Start-Y: {} End.Y: {}", playerAxisY.start(), playerAxisY.end());
         return moveStrategy.getFieldWithPosition(playerAxisX, playerAxisY, nodeList);
     }
-
-/*    public Node getNextFieldToCheck(MoveStrategy moveStrategy) {
-        if(!treasureFound) {
-            int fieldToCheckX;
-            int fieldToCheckY;
-
-            switch (moveStrategy) {
-                case RightCornerDown:
-                    // Position of RightCornerDown
-                    fieldToCheckX = myHalfEndX;
-                    fieldToCheckY = myHalfEndY;
-
-                    return getFieldWithPosition(fieldToCheckX, fieldToCheckY);
-
-                case RightCornerUp:
-                    // Position of RightCornerUp
-                    fieldToCheckX = myHalfEndX;
-                    fieldToCheckY = myHalfStartY;
-
-                    return getFieldWithPosition(fieldToCheckX, fieldToCheckY);
-
-                case LeftCornerDown:
-                    // Position of LeftCornerDown
-                    fieldToCheckX = myHalfStartX;
-                    fieldToCheckY = myHalfEndY;
-
-                    return getFieldWithPosition(fieldToCheckX, fieldToCheckY);
-            }
-
-            treasureFound = true;
-        }
-
-        return null;
-    }*/
-
-
-    private Node getFieldWithPosition(int fieldToCheckX, int fieldToCheckY) {
-        Node nodeToReturn = nodeList
-                .stream()
-                .filter(node -> node.field.getPositionX() == fieldToCheckX
-                        && node.field.getPositionY() == fieldToCheckY )
-                .findFirst().orElseThrow();
-
-        // If Node is Water get first adjacent non water Field
-        if(nodeToReturn.field.getTerrain() == Terrain.WATER) {
-            return nodeToReturn.getAdjacentNodes().keySet().stream()
-                    .filter(node -> node.field.getTerrain() != Terrain.WATER)
-                    .findFirst().orElseThrow();
-        }
-
-
-        return nodeToReturn;
-    }
-
 
 
 }
