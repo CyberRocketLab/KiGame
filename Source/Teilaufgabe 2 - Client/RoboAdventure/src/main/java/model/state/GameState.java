@@ -1,12 +1,12 @@
 package model.state;
 
+import converter.Converter;
 import messagesbase.messagesfromclient.ETerrain;
 import messagesbase.messagesfromserver.EFortState;
 import messagesbase.messagesfromserver.EPlayerGameState;
 import messagesbase.messagesfromserver.EPlayerPositionState;
 import messagesbase.messagesfromserver.ETreasureState;
 import model.data.Field;
-import model.data.Terrain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,12 @@ public class GameState {
     private List<Field> updatedMap = new ArrayList<>();
     boolean collectedTreasure = false;
 
+    private final Converter converterForClient;
+
+    public GameState(Converter converter) {
+        this.converterForClient = converter;
+    }
+
     public void addFieldToMap(int posX,
                               int posY,
                               ETerrain eTerrain,
@@ -23,37 +29,17 @@ public class GameState {
                               ETreasureState eTreasureStatetreasureState,
                               EFortState eFortStatefortState)
     {
-        Terrain terrain = null;
-        PlayerPositionState playerPositionState = null;
-        TreasureState treasureState = null;
-        FortState fortState = null;
-
-        switch (eTerrain) {
-            case Grass -> terrain = Terrain.GRASS;
-            case Water -> terrain = Terrain.WATER;
-            case Mountain -> terrain = Terrain.MOUNTAIN;
-        }
-
-        switch (ePlayerPositionState) {
-            case NoPlayerPresent -> playerPositionState = PlayerPositionState.NOBODY;
-            case MyPlayerPosition -> playerPositionState = PlayerPositionState.ME;
-            case EnemyPlayerPosition -> playerPositionState = PlayerPositionState.ENEMY;
-            case BothPlayerPosition -> playerPositionState = PlayerPositionState.BOTH;
-        }
-
-        switch (eTreasureStatetreasureState) {
-            case MyTreasureIsPresent -> treasureState = TreasureState.GoalTreasure;
-            case NoOrUnknownTreasureState -> treasureState = TreasureState.UnknownTreasure;
-        }
-
-        switch (eFortStatefortState) {
-            case MyFortPresent -> fortState = FortState.MyFort;
-            case EnemyFortPresent -> fortState = FortState.EnemyFort;
-            case NoOrUnknownFortState -> fortState = FortState.UnknownFort;
-        }
+       Field field = new Field(
+               posX,
+               posY,
+               converterForClient.getConvertedTerrain(eTerrain),
+               converterForClient.getConvertedPlayerPositionState(ePlayerPositionState),
+               converterForClient.getConvertedTreasureState(eTreasureStatetreasureState),
+               converterForClient.getConvertedFortState(eFortStatefortState)
+       );
 
 
-        updatedMap.add(new Field(posX, posY, terrain, playerPositionState, treasureState, fortState));
+        updatedMap.add(field);
 
     }
 

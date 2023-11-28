@@ -1,5 +1,7 @@
 package network;
 
+import converter.Converter;
+import converter.ClientConverter;
 import messagesbase.ResponseEnvelope;
 import messagesbase.UniquePlayerIdentifier;
 import messagesbase.messagesfromclient.*;
@@ -59,7 +61,9 @@ public class NetworkCommunication {
                         .findAny()
                         .orElse(null);
 
-        GameState gamePlayState = new GameState();
+
+        Converter converterForClient = new ClientConverter();
+        GameState gamePlayState = new GameState(converterForClient);
         assert playerState != null;
         gamePlayState.addClientState(playerState.getState(), playerState.hasCollectedTreasure());
 
