@@ -85,24 +85,15 @@ public class NetworkCommunication {
     }
 
     public void sendClientMap(List<Field> clientMap) {
-
-        while (getGameState().getClientState() != ClientState.MustAct) {
-            try {
-                Thread.sleep(400);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        IServerConverter serverConverter = new ServerConverter();
+        waitForMyTurn();
 
         List<PlayerHalfMapNode> clientMapToSend = serverConverter.convertToPlayerHalfMapNode(clientMap);
 
         PlayerHalfMap playerHalfMap = new PlayerHalfMap(clientData.getPlayerID(), clientMapToSend);
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/halfmaps")
-                .body(BodyInserters.fromValue(playerHalfMap)) // specify the data which is sent to the server
-                .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
+                .body(BodyInserters.fromValue(playerHalfMap))
+                .retrieve().bodyToMono(ResponseEnvelope.class);
 
         ResponseEnvelope result = webAccess.block();
 
@@ -112,8 +103,6 @@ public class NetworkCommunication {
             System.out.println("ERequestState : " + result.getState());
             logger.info("Map was send by Player={}", clientData.getStudentFirstName());
         }
-
-
     }
 
     public void registerClient() {
@@ -122,38 +111,26 @@ public class NetworkCommunication {
                                                                 clientData.getStudentUAccount());
 
         Mono<ResponseEnvelope> webAccess = baseWebClient.method(HttpMethod.POST).uri("/" + gameID.id() + "/players")
-                .body(BodyInserters.fromValue(playerReg)) // specify the data which is sent to the server
-                .retrieve().bodyToMono(ResponseEnvelope.class); // specify the object returned by the server
+                .body(BodyInserters.fromValue(playerReg))
+                .retrieve().bodyToMono(ResponseEnvelope.class);
 
         ResponseEnvelope<UniquePlayerIdentifier> resultReg = webAccess.block();
-
 
         if (resultReg.getState() == ERequestState.Error) {
             System.err.println("Client error, errormessage: " + resultReg.getExceptionMessage());
         } else {
             UniquePlayerIdentifier uniqueID = resultReg.getData().get();
-           // System.out.println("My Player ID: " + uniqueID.getUniquePlayerID());
             clientData.setPlayerID(uniqueID.getUniquePlayerID());
             logger.info("Client {} was created!", clientData.getStudentFirstName());
         }
-
     }
 
     public void sendMove(EMoves move) {
-        ClientState state = getGameState().getClientState();
-
-        if (state == ClientState.Lost || state == ClientState.Won) {
-            logger.info("Game:{}",  state);
+        if(isGameEnd()) {
             return;
         }
 
-        while (getGameState().getClientState() != ClientState.MustAct) {
-            try {
-                Thread.sleep(400);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        waitForMyTurn();
 
         PlayerMove playerMove = PlayerMove.of(clientData.getPlayerID(), serverConverter.convertToEMove(move));
 
@@ -169,17 +146,34 @@ public class NetworkCommunication {
         } else {
             logger.info("Move was send by Player={}", clientData.getStudentFirstName());
         }
-
     }
 
     private void waitForMyTurn() {
-        while (getGameState().getClientState() != ClientState.MustAct) {
+        ClientState state = getGameState().getClientState();
+        while (state != ClientState.MustAct) {
             try {
                 Thread.sleep(400);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+
+            if(state == ClientState.Lost || state == ClientState.Won) {
+                break;
+            }
+
+            state = getGameState().getClientState();
         }
+    }
+
+    private boolean isGameEnd() {
+        ClientState state = getGameState().getClientState();
+
+        if (state == ClientState.Lost || state == ClientState.Won) {
+            logger.info("Game:{}",  state);
+            return true;
+        }
+
+        return false;
     }
 
 
