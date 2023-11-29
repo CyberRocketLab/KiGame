@@ -32,6 +32,9 @@ public class ClientController {
     GameView gameView;
     NetworkCommunication networkCommunication;
 
+    private static final int ALLOWED_GAME_ACTIONS = 160;
+    private int gameActions = 0;
+
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
 
         IClientConverter clientConverter = new ClientConverter();
@@ -59,15 +62,16 @@ public class ClientController {
         boolean treasureFoundOnce = false;
         boolean burgFoundOnce = false;
 
-        boolean isPlaying = true;
-        while (isPlaying) {
+        boolean remake = true;
+
+        while (gameActions < ALLOWED_GAME_ACTIONS ) {
+
             logger.debug("Entering While loop");
 
             // Stop game if LOST or WON
             if(gameState.getClientState() == ClientState.Lost || gameState.getClientState() == ClientState.Won) {
-                isPlaying = false;
                 logger.debug("Game: {}", gameState.getClientState());
-                continue;
+                break;
             }
 
             Move move = new Move(game.getListOfFields());
@@ -121,7 +125,7 @@ public class ClientController {
             List<EMoves> movesToTarget = move.getMoves();
 
 
-            while(gameState.getClientState() != ClientState.Lost || gameState.getClientState() != ClientState.Won) {
+            while(gameState.getClientState() != ClientState.Lost && gameState.getClientState() != ClientState.Won) {
                 if(movesToTarget.isEmpty()) {
                     logger.debug("The List with moves is empty");
                     break;
@@ -141,15 +145,35 @@ public class ClientController {
                     }
                 }
 
-                sendMoveToServer(movesToTarget.remove(0));
-                gameState = getGamePlayState();
+               // sendMoveToServer(movesToTarget.remove(0));
+                EMoves right = EMoves.Right;
+                EMoves left = EMoves.Left;
 
+                if (remake) {
+                    sendMoveToServer(right);
+                    remake = false;
+                } else {
+                    sendMoveToServer(left);
+                    remake = true;
+                }
+
+                gameState = getGamePlayState();
                 game.updateMap(gameState.getUpdatedMap());
+
+               if (++gameActions == ALLOWED_GAME_ACTIONS) {
+                   break;
+               }
+               logger.info("Current Actions: {}", gameActions);
             }
 
             logger.debug("End of WhileLoop!");
             logger.debug("Size of moveStrategies:{}", moveStrategies.size());
 
+        }
+
+        if(gameActions == ALLOWED_GAME_ACTIONS) {
+            logger.info("To much actions move: {}", gameActions);
+            System.out.println("Game: " + gameState.getClientState());
         }
 
 
@@ -175,8 +199,19 @@ public class ClientController {
     private Queue<MoveStrategy> setStrategies() {
         Queue<MoveStrategy> moveStrategies = new LinkedList<>();
         moveStrategies.add(new RightCornerDown());
+        moveStrategies.add(new CheckUnvisitedFields());
+        moveStrategies.add(new CheckUnvisitedFields());
+        moveStrategies.add(new CheckUnvisitedFields());
+
         moveStrategies.add(new RightCornerUp());
+        moveStrategies.add(new CheckUnvisitedFields());
+        moveStrategies.add(new CheckUnvisitedFields());
+        moveStrategies.add(new CheckUnvisitedFields());
+
         moveStrategies.add(new LeftCornerDown());
+        moveStrategies.add(new CheckUnvisitedFields());
+        moveStrategies.add(new CheckUnvisitedFields());
+        moveStrategies.add(new CheckUnvisitedFields());
         moveStrategies.add(new LeftCornerUp());
 
         return moveStrategies;
