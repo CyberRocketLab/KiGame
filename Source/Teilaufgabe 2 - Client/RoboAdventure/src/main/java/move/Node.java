@@ -11,26 +11,27 @@ import java.util.stream.Collectors;
 
 public class Node {
     private final Field field;
+    public Map<Node, Integer> adjacentNodes = new HashMap<>();
     private List<Node> shortestPathFromSource = new LinkedList<>();
     private Integer distanceInMoves = Integer.MAX_VALUE;
-    public Map<Node, Integer> adjacentNodes = new HashMap<>();
 
     public Node(Field field) {
         this.field = field;
     }
+
     public void addAdjacentNodes(List<Node> map) {
         List<Node> nodes =
                 map.stream()
                         .filter(node ->
-                                ((node.getField().getPositionX() == (field.getPositionX() +1) && node.getField().getPositionY() == field.getPositionY()) ||
-                                (node.getField().getPositionX() == (field.getPositionX() -1) && node.getField().getPositionY() == field.getPositionY()) ||
-                                (node.getField().getPositionY() == (field.getPositionY() +1) && node.getField().getPositionX() == field.getPositionX()) ||
-                                (node.getField().getPositionY() == (field.getPositionY() -1) && node.getField().getPositionX() == field.getPositionX()) )
-                                && node.getField().getTerrain() != Terrain.WATER
+                                        ((node.getField().getPositionX() == (field.getPositionX() + 1) && node.getField().getPositionY() == field.getPositionY()) ||
+                                        (node.getField().getPositionX() == (field.getPositionX() - 1) && node.getField().getPositionY() == field.getPositionY()) ||
+                                        (node.getField().getPositionY() == (field.getPositionY() + 1) && node.getField().getPositionX() == field.getPositionX()) ||
+                                        (node.getField().getPositionY() == (field.getPositionY() - 1) && node.getField().getPositionX() == field.getPositionX()))
+                                        && node.getField().getTerrain() != Terrain.WATER
                         ).toList();
 
 
-        for(Node adjacentField : nodes) {
+        for (Node adjacentField : nodes) {
             int moves = 0;
             switch (field.getTerrain()) {
                 case GRASS -> {

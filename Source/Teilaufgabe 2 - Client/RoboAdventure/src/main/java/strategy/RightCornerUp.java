@@ -26,6 +26,9 @@ public class RightCornerUp implements MoveStrategy {
             throw new MoveStrategyException("Could not find Node");
         }
 
+        if(nodeToReturn.get().getField().isVisited()) {
+            return getAdjacentNonWaterField(nodeToReturn.get());
+        }
 
         if (nodeToReturn.get().getField().getTerrain() == Terrain.WATER) {
             return getAdjacentNonWaterField(nodeToReturn.get());

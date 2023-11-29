@@ -15,11 +15,11 @@ public class Graph {
         while (!unvisitedNodes.isEmpty()) {
             Node currentNode = unvisitedNodes.poll();
 
-            for (Map.Entry<Node,Integer> adjacentNode: currentNode.getAdjacentNodes().entrySet()) {
+            for (Map.Entry<Node, Integer> adjacentNode : currentNode.getAdjacentNodes().entrySet()) {
                 Node node = adjacentNode.getKey();
                 int moves = adjacentNode.getValue();
 
-                if(!visitedNodes.contains(node)) {
+                if (!visitedNodes.contains(node)) {
                     calculateMinimumDistance(node, moves, currentNode);
                     unvisitedNodes.add(node);
                 }
@@ -35,7 +35,6 @@ public class Graph {
 
         if (sumDistance < nodeToEvaluate.getDistanceInMoves()) {
             nodeToEvaluate.setDistanceInMoves(sumDistance);
-
 
             List<Node> shortestPath = new LinkedList<>(sourceNode.getShortestPathFromSource());
             shortestPath.add(sourceNode);

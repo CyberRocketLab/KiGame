@@ -28,11 +28,10 @@ import java.util.*;
 
 public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+    private static final int ALLOWED_GAME_ACTIONS = 160;
     Game game;
     GameView gameView;
     NetworkCommunication networkCommunication;
-
-    private static final int ALLOWED_GAME_ACTIONS = 160;
     private int gameActions = 0;
 
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
@@ -62,21 +61,19 @@ public class ClientController {
         boolean treasureFoundOnce = false;
         boolean burgFoundOnce = false;
 
-        boolean remake = true;
-
-        while (gameActions < ALLOWED_GAME_ACTIONS ) {
+        while (gameActions < ALLOWED_GAME_ACTIONS) {
 
             logger.debug("Entering While loop");
 
             // Stop game if LOST or WON
-            if(gameState.getClientState() == ClientState.Lost || gameState.getClientState() == ClientState.Won) {
+            if (gameState.getClientState() == ClientState.Lost || gameState.getClientState() == ClientState.Won) {
                 logger.debug("Game: {}", gameState.getClientState());
                 break;
             }
 
             Move move = new Move(game.getListOfFields());
 
-            if(!startIsSet) {
+            if (!startIsSet) {
                 startPosition = move.getPlayerPosition();
                 startIsSet = true;
             }
@@ -84,12 +81,12 @@ public class ClientController {
             NextFieldToCheck nextFieldFinder = new NextFieldToCheck(game.getMap(), move.getNodeList(), startPosition);
 
 
-            if(moveStrategies.isEmpty()) {
+            if (moveStrategies.isEmpty()) {
                 moveStrategies.add(new CheckUnvisitedFields());
                 logger.debug("Main Strategy is done. Moving to Plan B strategy!");
             }
 
-            if(findBurgStrategy.isEmpty()) {
+            if (findBurgStrategy.isEmpty()) {
                 findBurgStrategy.add(new CheckUnvisitedFields());
                 logger.debug("Main Strategy is done. Moving to Plan B strategy!");
             }
@@ -111,7 +108,7 @@ public class ClientController {
                 logger.debug("Position of Treasure {}{}.", fortNode.getField().getPositionX(), fortNode.getField().getPositionY());
                 move.setMovesToTargetField(fortNode);
 
-            } else if(isTreasureCollected)  {
+            } else if (isTreasureCollected) {
                 logger.debug("Treasure is collected: {}", true);
                 nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(findBurgStrategy.poll(), isTreasureCollected);
                 move.setMovesToTargetField(nextFieldToCheck);
@@ -125,13 +122,13 @@ public class ClientController {
             List<EMoves> movesToTarget = move.getMoves();
 
 
-            while(gameState.getClientState() != ClientState.Lost && gameState.getClientState() != ClientState.Won) {
-                if(movesToTarget.isEmpty()) {
+            while (gameState.getClientState() != ClientState.Lost && gameState.getClientState() != ClientState.Won) {
+                if (movesToTarget.isEmpty()) {
                     logger.debug("The List with moves is empty");
                     break;
                 }
 
-                if(!treasureFoundOnce) {
+                if (!treasureFoundOnce) {
                     if (game.isTreasureFound()) {
                         treasureFoundOnce = true;
                         break;
@@ -139,31 +136,21 @@ public class ClientController {
                 }
 
                 if (!burgFoundOnce) {
-                    if(game.isFortFound()) {
+                    if (game.isFortFound()) {
                         burgFoundOnce = true;
                         break;
                     }
                 }
 
-               // sendMoveToServer(movesToTarget.remove(0));
-                EMoves right = EMoves.Right;
-                EMoves left = EMoves.Left;
-
-                if (remake) {
-                    sendMoveToServer(right);
-                    remake = false;
-                } else {
-                    sendMoveToServer(left);
-                    remake = true;
-                }
+                sendMoveToServer(movesToTarget.remove(0));
 
                 gameState = getGamePlayState();
                 game.updateMap(gameState.getUpdatedMap());
 
-               if (++gameActions == ALLOWED_GAME_ACTIONS) {
-                   break;
-               }
-               logger.info("Current Actions: {}", gameActions);
+                if (++gameActions == ALLOWED_GAME_ACTIONS) {
+                    break;
+                }
+                logger.info("Current Actions: {}", gameActions);
             }
 
             logger.debug("End of WhileLoop!");
@@ -171,7 +158,7 @@ public class ClientController {
 
         }
 
-        if(gameActions == ALLOWED_GAME_ACTIONS) {
+        if (gameActions == ALLOWED_GAME_ACTIONS) {
             logger.info("To much actions move: {}", gameActions);
             System.out.println("Game: " + gameState.getClientState());
         }
@@ -183,7 +170,7 @@ public class ClientController {
         networkCommunication.registerClient();
     }
 
-    private List<Field> generateHalfMap(){
+    private List<Field> generateHalfMap() {
         BusinessLogicInterface businessLogic = new BalancedTerrainDistributionLogic();
         GameMapGenerator mapGenerator = new GameMapGenerator(businessLogic);
 
@@ -198,20 +185,10 @@ public class ClientController {
 
     private Queue<MoveStrategy> setStrategies() {
         Queue<MoveStrategy> moveStrategies = new LinkedList<>();
+
         moveStrategies.add(new RightCornerDown());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new CheckUnvisitedFields());
-
         moveStrategies.add(new RightCornerUp());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new CheckUnvisitedFields());
-
         moveStrategies.add(new LeftCornerDown());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new CheckUnvisitedFields());
         moveStrategies.add(new LeftCornerUp());
 
         return moveStrategies;

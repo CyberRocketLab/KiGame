@@ -126,9 +126,9 @@ public class NetworkCommunication {
     }
 
     public void sendMove(EMoves move) {
-        if(isGameEnd()) {
+        /*if(isGameEnd()) {
             return;
-        }
+        }*/
 
         waitForMyTurn();
 
