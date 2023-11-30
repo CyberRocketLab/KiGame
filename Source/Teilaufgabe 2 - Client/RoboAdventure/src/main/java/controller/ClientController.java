@@ -12,7 +12,9 @@ import model.generator.BusinessLogicInterface;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
 import model.state.GameState;
+import model.validator.BusinessRules;
 import model.validator.MapValidator;
+import model.validator.ServerBusinessRules;
 import move.EMoves;
 import move.Move;
 import move.NextFieldToCheck;
@@ -206,7 +208,8 @@ public class ClientController {
     }
 
     private boolean validateMap(List<Field> randomMap) {
-        MapValidator mapValidator = new MapValidator();
+        BusinessRules businessRules = new ServerBusinessRules();
+        MapValidator mapValidator = new MapValidator(businessRules);
         return mapValidator.validateMap(randomMap);
     }
 

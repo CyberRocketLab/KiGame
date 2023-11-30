@@ -1,10 +1,13 @@
 package model.validator;
 
 import exceptions.MapBusinessRuleException;
+import model.data.GameMap;
 import model.position.Position;
 import model.data.Field;
 import model.data.Terrain;
 import model.state.PlayerPositionState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,15 +15,24 @@ import java.util.Optional;
 import java.util.Stack;
 
 public class MapValidator {
-    private static final int ROWS = 5;
-    private static final int COLUMNS = 10;
+    private static final Logger logger = LoggerFactory.getLogger(MapValidator.class);
+    private final int ROWS;
+    private final int COLUMNS;
+    private final BusinessRules businessRules;
+
+    public MapValidator(BusinessRules businessRules) {
+        this.businessRules = businessRules;
+        this.ROWS = businessRules.getROWS();
+        this.COLUMNS = businessRules.getCOLUMNS();
+    }
 
     public boolean validateMap(List<Field> originalMap) {
         if (originalMap == null || originalMap.isEmpty()) {
+            logger.error("Input Map is null or empty");
             throw new MapBusinessRuleException("The map is empty or null");
         }
 
-        if (!validateBusinessRules(originalMap)) {
+        if (!businessRules.validateBusinessRules(originalMap)) {
             return false;
         }
 
@@ -37,8 +49,9 @@ public class MapValidator {
             matrix[field.getPositionY()][field.getPositionX()] = field;
         }
 
-        if (!isAllowedAmountOfWaterOnEdges(matrix)) {
-            System.out.println("Not Allowed Water on egdes");
+
+        if (!businessRules.isAllowedAmountOfWaterOnEdges(matrix)) {
+            logger.info("To much water on edges of map");
             return false;
         }
 
@@ -68,59 +81,6 @@ public class MapValidator {
         return allFieldsVisited(matrix);
     }
 
-    private boolean validateBusinessRules(List<Field> map) {
-        int minAmountOfWater = 7;
-        int minAmountOfGrass = 24;
-        int minAmountOfMountain = 5;
-
-        long countWater = map.stream()
-                .filter(field -> field.getTerrain() == Terrain.WATER)
-                .count();
-
-        long countGrass = map.stream()
-                .filter(field -> field.getTerrain() == Terrain.GRASS)
-                .count();
-
-        long countMountain = map.stream()
-                .filter(field -> field.getTerrain() == Terrain.MOUNTAIN)
-                .count();
-
-        return (countWater >= minAmountOfWater) &&
-                (countGrass >= minAmountOfGrass) &&
-                ( countMountain >= minAmountOfMountain);
-    }
-
-    private boolean isAllowedAmountOfWaterOnEdges(Field[][] matrix) {
-        int shortEdgeMaxWater = 2;
-        int longEdgeMaxWater = 4;
-
-        int topEdgeWater = 0;
-        int bottomEdgeWater = 0;
-        for(int x = 0; x < COLUMNS; ++x) {
-            if(matrix[0][x].getTerrain() == Terrain.WATER) {
-                ++topEdgeWater;
-            }
-            if(matrix[4][x].getTerrain() == Terrain.WATER) {
-                ++bottomEdgeWater;
-            }
-        }
-
-        int leftEdgeWater = 0;
-        int rightEdgeWater = 0;
-        for (int y = 0; y < ROWS; y++) {
-            if (matrix[y][0].getTerrain() == Terrain.WATER) {
-                ++leftEdgeWater;
-            }
-            if (matrix[y][9].getTerrain() == Terrain.WATER) {
-                ++rightEdgeWater;
-            }
-        }
-
-        return topEdgeWater <= longEdgeMaxWater &&
-                bottomEdgeWater <= longEdgeMaxWater &&
-                leftEdgeWater <= shortEdgeMaxWater &&
-                rightEdgeWater <= shortEdgeMaxWater;
-    }
 
     private Optional<Position> getFirstNonWaterField(List<Field> mapToValidate) {
         return mapToValidate.stream()
@@ -130,26 +90,26 @@ public class MapValidator {
     }
 
     private List<Position> getAdjacentFieldsPosition(int horizontalX, int verticalY, Field[][] matrix) {
-        List<Position> adjacentFields= new ArrayList<>();
+        List<Position> adjacentFields = new ArrayList<>();
 
         // Right Field from current Field
         if (horizontalX + 1 < COLUMNS && matrix[verticalY][horizontalX + 1].getPlayerPositionState() != PlayerPositionState.VISITED) {
-            adjacentFields.add(new Position(horizontalX + 1,verticalY));
+            adjacentFields.add(new Position(horizontalX + 1, verticalY));
         }
 
         // Left Field from current Field
         if (horizontalX - 1 >= 0 && matrix[verticalY][horizontalX - 1].getPlayerPositionState() != PlayerPositionState.VISITED) {
-            adjacentFields.add(new Position(horizontalX - 1,verticalY));
+            adjacentFields.add(new Position(horizontalX - 1, verticalY));
         }
 
         // Up Field from current Field
-        if (verticalY + 1 < ROWS && matrix[verticalY +1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
-            adjacentFields.add(new Position(horizontalX,verticalY + 1));
+        if (verticalY + 1 < ROWS && matrix[verticalY + 1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
+            adjacentFields.add(new Position(horizontalX, verticalY + 1));
         }
 
         // Down Field from current Field
-        if (verticalY - 1 >= 0 &&  matrix[verticalY -1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
-            adjacentFields.add(new Position(horizontalX,verticalY - 1));
+        if (verticalY - 1 >= 0 && matrix[verticalY - 1][horizontalX].getPlayerPositionState() != PlayerPositionState.VISITED) {
+            adjacentFields.add(new Position(horizontalX, verticalY - 1));
         }
 
         return adjacentFields;
