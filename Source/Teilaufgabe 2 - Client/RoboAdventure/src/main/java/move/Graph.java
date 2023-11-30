@@ -10,15 +10,6 @@ public class Graph {
         Set<Node> visitedNodes = new HashSet<>();
         PriorityQueue<Node> unvisitedNodes = new PriorityQueue<>(Comparator.comparingInt(Node::getDistanceInMoves));
 
-        /*PriorityQueue<Node> unvisitedNodes = new PriorityQueue<>((node1, node2) -> {
-            if (node1.getField().isVisited() && !node2.getField().isVisited()) {
-                return 1;
-            } else if (!node1.getField().isVisited() && node2.getField().isVisited()) {
-                return -1;
-            }
-            return Integer.compare(node1.getDistanceInMoves(), node2.getDistanceInMoves());
-        });*/
-
         unvisitedNodes.add(source);
 
         while (!unvisitedNodes.isEmpty()) {
@@ -40,10 +31,7 @@ public class Graph {
     }
 
     private static void calculateMinimumDistance(Node nodeToEvaluate, int moves, Node sourceNode) {
-       /* if (nodeToEvaluate.getField().isVisited()) {
-            return;
-        }
-*/
+
         int sumDistance = moves + sourceNode.getDistanceInMoves();
 
         if (sumDistance < nodeToEvaluate.getDistanceInMoves()) {

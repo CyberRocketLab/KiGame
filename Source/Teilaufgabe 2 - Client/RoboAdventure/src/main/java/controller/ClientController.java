@@ -186,10 +186,21 @@ public class ClientController {
     private Queue<MoveStrategy> setStrategies() {
         Queue<MoveStrategy> moveStrategies = new LinkedList<>();
 
-        moveStrategies.add(new RightCornerDown());
+        /*moveStrategies.add(new RightCornerDown());
+        moveStrategies.add(new CheckUnvisitedFields());
         moveStrategies.add(new RightCornerUp());
+        moveStrategies.add(new CheckUnvisitedFields());
         moveStrategies.add(new LeftCornerDown());
+        moveStrategies.add(new CheckUnvisitedFields());
         moveStrategies.add(new LeftCornerUp());
+        */
+        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());
 
         return moveStrategies;
     }
