@@ -5,14 +5,14 @@ import model.data.Terrain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BalancedTerrainDistributionLogic implements BusinessLogicInterface{
-   private static final double percentOfWater = 0.14;
-    private static final double percentOfGrass = 0.6;
-    private static final double percentOfMountain = 0.26;
+public class BalancedTerrainDistributionLogic implements BusinessLogicInterface {
+    public static final double percentOfWater = 0.14;
+    public static final double percentOfGrass = 0.6;
+    public static final double percentOfMountain = 0.26;
 
 
     @Override
-    public List<Terrain> calculateAmountOfTerrains(int maxRows, int maxColumns) {
+    public List<Terrain> getAmountOfTerrains(int maxRows, int maxColumns) {
         List<Terrain> terrainList = new ArrayList<>();
 
         int totalQuantityOfFields = maxRows * maxColumns;
