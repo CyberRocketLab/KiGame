@@ -36,7 +36,7 @@ public class Move {
 
     public Node getPlayerPosition() {
         return nodeList.stream()
-                .filter(node -> node.getField().getPlayerPositionState() == PlayerPositionState.ME)
+                .filter(node -> node.getField().getPlayerPositionState() == PlayerPositionState.ME || node.getField().getPlayerPositionState() == PlayerPositionState.BOTH)
                 .findFirst().orElseThrow();
     }
 
