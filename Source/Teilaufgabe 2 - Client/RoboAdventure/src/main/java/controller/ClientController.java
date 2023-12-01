@@ -196,13 +196,26 @@ public class ClientController {
         moveStrategies.add(new CheckUnvisitedFields());
         moveStrategies.add(new LeftCornerUp());
         */
+        /*moveStrategies.add(new CheckUnvisitedMountains());
         moveStrategies.add(new CheckUnvisitedMountains());
         moveStrategies.add(new CheckUnvisitedMountains());
         moveStrategies.add(new CheckUnvisitedMountains());
         moveStrategies.add(new CheckUnvisitedMountains());
         moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
+        moveStrategies.add(new CheckUnvisitedMountains());*/
+
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+        moveStrategies.add(new VisitedNearestMountainToKI());
+
 
         return moveStrategies;
     }
