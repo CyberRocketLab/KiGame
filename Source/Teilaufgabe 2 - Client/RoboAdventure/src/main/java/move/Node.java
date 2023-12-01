@@ -1,7 +1,10 @@
 package move;
 
+import exceptions.NodeException;
 import model.data.Field;
 import model.data.Terrain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,16 +13,27 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Node {
+    private static final Logger logger = LoggerFactory.getLogger(Node.class);
     private final Field field;
     public Map<Node, Integer> adjacentNodes = new HashMap<>();
     private List<Node> shortestPathFromSource = new LinkedList<>();
     private Integer distanceInMoves = Integer.MAX_VALUE;
 
     public Node(Field field) {
+        if (field == null) {
+            logger.error("Provided parameter to Constructor was null");
+            throw new NodeException("Field cannot be null");
+        }
+
         this.field = field;
     }
 
     public void addAdjacentNodes(List<Node> map) {
+        if (map == null || map.isEmpty()) {
+            logger.error("Provided parameter to addAdjacentNodes was null or empry");
+            throw new NodeException("Map cannot be Null or Empty");
+        }
+
         List<Node> nodes =
                 map.stream()
                         .filter(node ->

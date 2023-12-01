@@ -1,5 +1,6 @@
 package move;
 
+import exceptions.MoveException;
 import model.data.Field;
 import model.data.Terrain;
 import model.state.PlayerPositionState;
@@ -19,6 +20,11 @@ public class Move {
     private List<EMoves> moves = new ArrayList<>();
 
     public Move(List<Field> map) {
+        if (map == null || map.isEmpty()) {
+            logger.error("Provided map for Move class was Null or Empty");
+            throw new MoveException("Map cannot be null or empty");
+        }
+
         map.forEach(field -> this.nodeList.add(new Node(field)));
         nodeList.forEach(node -> node.addAdjacentNodes(nodeList));
 
@@ -29,7 +35,6 @@ public class Move {
     }
 
     public Node getPlayerPosition() {
-
         return nodeList.stream()
                 .filter(node -> node.getField().getPlayerPositionState() == PlayerPositionState.ME)
                 .findFirst().orElseThrow();
@@ -43,6 +48,11 @@ public class Move {
 
 
     private void setTargetNode(Node targetNode) {
+        if (targetNode == null) {
+            logger.error("Provided targetNode for Move class was Null");
+            throw new MoveException("Target Node cannot be null");
+        }
+
         sourceNode = getPlayerPosition();
         logger.debug("Source Node {}", sourceNode);
 
@@ -55,6 +65,11 @@ public class Move {
     }
 
     public void setMovesToTargetField(Node targetNode) {
+        if (targetNode == null) {
+            logger.error("Provided targetNode for Move class was Null");
+            throw new MoveException("Target Node cannot be null");
+        }
+
         logger.debug("Setting moves to target Node: X:{} , Y:{}", targetNode.getField().getPositionX(), targetNode.getField().getPositionY());
         setTargetNode(targetNode);
         logger.debug("Moves to Target Node: {}", movesToTargetField);
@@ -92,6 +107,10 @@ public class Move {
     }
 
     public int calculateMoveCost(Terrain currentTerrain, Terrain nextTerrain) {
+        if (currentTerrain == null || nextTerrain == null) {
+            logger.error("Provided currentTerrain: {} or nextTerrain: {} for calculateMoveCost was null", currentTerrain, nextTerrain);
+            throw new MoveException("Provided currentTerrain or nextTerrain cannot be null");
+        }
 
         if (currentTerrain == Terrain.GRASS && nextTerrain == Terrain.GRASS) {
             return 2;

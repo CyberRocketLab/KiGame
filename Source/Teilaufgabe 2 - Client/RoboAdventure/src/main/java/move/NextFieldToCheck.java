@@ -1,6 +1,7 @@
 package move;
 
 import controller.ClientController;
+import exceptions.NextFieldToCheckException;
 import model.data.GameMap;
 import model.data.Terrain;
 import model.state.PlayerPositionState;
@@ -23,6 +24,11 @@ public class NextFieldToCheck {
 
 
     public NextFieldToCheck(GameMap map, List<Node> nodeList, Node startPosition) {
+        if (map == null || nodeList == null || startPosition == null) {
+            logger.error("One of provided variables was null. Map: {}, nodeList: {}, startPosition: {}", map, nodeList, startPosition );
+            throw new NextFieldToCheckException("Provided parameters to Constructor cannot be null");
+        }
+
         int edgeOfX = map.getEdgeOfX();
         int edgeOfY = map.getEdgeOfY();
         this.nodeList = nodeList;
@@ -58,6 +64,11 @@ public class NextFieldToCheck {
     }
 
     public Node getNextFieldToCheck(MoveStrategy moveStrategy, boolean isTreasureCollected) {
+        if (moveStrategy == null) {
+            logger.error("Provided MoveStrategy parameter for getNextFieldToCheck was null");
+            throw new NextFieldToCheckException("Provided parameters to getNextFieldToCheck cannot be null");
+        }
+
         // if collected then search in enemy area
         if(isTreasureCollected) {
             logger.debug("Enemy Start-X: {} End-X: {}", enemyAxisX.start(), enemyAxisX.end());
