@@ -1,5 +1,6 @@
 package model.generator;
 
+import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
 import model.data.Terrain;
 import model.state.FortState;
@@ -61,7 +62,7 @@ class GameMapGeneratorTest {
 
         GameMapGenerator gameMapGenerator = new GameMapGenerator(businessLogicInterface);
 
-        assertThrows(IllegalArgumentException.class, gameMapGenerator::generateRandomMap);
+        assertThrows(NullOrEmptyParameterException.class, gameMapGenerator::generateRandomMap);
     }
 
     @Test
@@ -72,7 +73,7 @@ class GameMapGeneratorTest {
 
         GameMapGenerator gameMapGenerator = new GameMapGenerator(businessLogicInterface);
 
-        assertThrows(IllegalArgumentException.class, gameMapGenerator::generateRandomMap);
+        assertThrows(NullOrEmptyParameterException.class, gameMapGenerator::generateRandomMap);
     }
 
 

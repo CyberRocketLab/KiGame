@@ -1,8 +1,7 @@
 package strategy;
 
-import exceptions.MoveStrategyException;
+import exceptions.NoFoundException;
 import model.data.Terrain;
-import model.position.Position;
 import move.Node;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public interface MoveStrategy {
                 .findFirst();
 
         if (adjacentNode.isEmpty()) {
-            throw new MoveStrategyException("Could not find non Water Field");
+            throw new NoFoundException();
         }
 
         return adjacentNode.get();

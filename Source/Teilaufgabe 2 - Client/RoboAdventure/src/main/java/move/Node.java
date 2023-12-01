@@ -1,6 +1,6 @@
 package move;
 
-import exceptions.NodeException;
+import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
 import model.data.Terrain;
 import org.slf4j.Logger;
@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Node {
     private static final Logger logger = LoggerFactory.getLogger(Node.class);
@@ -22,7 +21,7 @@ public class Node {
     public Node(Field field) {
         if (field == null) {
             logger.error("Provided parameter to Constructor was null");
-            throw new NodeException("Field cannot be null");
+            throw new NullOrEmptyParameterException();
         }
 
         this.field = field;
@@ -30,8 +29,8 @@ public class Node {
 
     public void addAdjacentNodes(List<Node> map) {
         if (map == null || map.isEmpty()) {
-            logger.error("Provided parameter to addAdjacentNodes was null or empry");
-            throw new NodeException("Map cannot be Null or Empty");
+            logger.error("Provided parameter to addAdjacentNodes was null or empty");
+            throw new NullOrEmptyParameterException();
         }
 
         List<Node> nodes =

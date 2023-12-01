@@ -1,5 +1,6 @@
 package model.data;
 
+import exceptions.NullOrEmptyParameterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class GameMap {
     public GameMap(List<Field> fields) {
         if (fields == null || fields.isEmpty()) {
             logger.error("Map initialization failed: input list is null or empty");
-            throw new IllegalArgumentException("Map cannot be null or empty");
+            throw new NullOrEmptyParameterException();
         }
 
         this.fields = fields;

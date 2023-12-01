@@ -1,10 +1,7 @@
 package move;
 
-import controller.ClientController;
-import exceptions.NextFieldToCheckException;
+import exceptions.NullOrEmptyParameterException;
 import model.data.GameMap;
-import model.data.Terrain;
-import model.state.PlayerPositionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import strategy.MoveStrategy;
@@ -26,7 +23,7 @@ public class NextFieldToCheck {
     public NextFieldToCheck(GameMap map, List<Node> nodeList, Node startPosition) {
         if (map == null || nodeList == null || startPosition == null) {
             logger.error("One of provided variables was null. Map: {}, nodeList: {}, startPosition: {}", map, nodeList, startPosition );
-            throw new NextFieldToCheckException("Provided parameters to Constructor cannot be null");
+            throw new NullOrEmptyParameterException();
         }
 
         int edgeOfX = map.getEdgeOfX();
@@ -66,7 +63,7 @@ public class NextFieldToCheck {
     public Node getNextFieldToCheck(MoveStrategy moveStrategy, boolean isTreasureCollected) {
         if (moveStrategy == null) {
             logger.error("Provided MoveStrategy parameter for getNextFieldToCheck was null");
-            throw new NextFieldToCheckException("Provided parameters to getNextFieldToCheck cannot be null");
+            throw new NullOrEmptyParameterException();
         }
 
         // if collected then search in enemy area

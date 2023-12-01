@@ -1,8 +1,7 @@
 package strategy;
 
-import exceptions.MoveStrategyException;
+import exceptions.NoFoundException;
 import model.data.Terrain;
-import model.position.Position;
 import move.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class RightCornerDown implements MoveStrategy {
 
         if (nodeToReturn.isEmpty()) {
             logger.error("Could not find Node");
-            throw new MoveStrategyException("Could not find Node");
+            throw new NoFoundException();
         }
 
 

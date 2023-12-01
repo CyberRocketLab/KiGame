@@ -1,11 +1,9 @@
 package move;
 
-import exceptions.MoveException;
+import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
 import model.state.PlayerPositionState;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -21,12 +19,12 @@ class MoveTest {
     public void givenEmptyMap_whenPassingToMoveConstructor_thenError() {
         List<Field> map = new ArrayList<>();
 
-        assertThrows(MoveException.class, () -> new Move(map));
+        assertThrows(NullOrEmptyParameterException.class, () -> new Move(map));
     }
 
     @Test
     public void givenNullMap_whenPassingToMoveConstructor_thenError() {
-        assertThrows(MoveException.class, () -> new Move(null));
+        assertThrows(NullOrEmptyParameterException.class, () -> new Move(null));
     }
 
     @Test
@@ -39,7 +37,7 @@ class MoveTest {
 
         Move move = new Move(map);
 
-        assertThrows(MoveException.class, () -> move.setMovesToTargetField(null));
+        assertThrows(NullOrEmptyParameterException.class, () -> move.setMovesToTargetField(null));
     }
 
     @Test
@@ -52,7 +50,7 @@ class MoveTest {
 
         Move move = new Move(map);
 
-        assertThrows(MoveException.class, () -> move.setMovesToTargetField(null));
+        assertThrows(NullOrEmptyParameterException.class, () -> move.setMovesToTargetField(null));
     }
 
     @Test
@@ -65,7 +63,7 @@ class MoveTest {
 
         Move move = new Move(map);
 
-        assertThrows(MoveException.class, () -> move.calculateMoveCost(null, null));
+        assertThrows(NullOrEmptyParameterException.class, () -> move.calculateMoveCost(null, null));
     }
 
 

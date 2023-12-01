@@ -1,6 +1,6 @@
 package model.validator;
 
-import exceptions.MapBusinessRuleException;
+import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,12 +45,12 @@ class MapValidatorTest {
     public void ListIsEmpty_whenPassing_thenMapBusinessRuleException() {
         List<Field> fieldList = new ArrayList<>();
 
-        assertThrows(MapBusinessRuleException.class, () -> mapValidator.validateMap(fieldList));
+        assertThrows(NullOrEmptyParameterException.class, () -> mapValidator.validateMap(fieldList));
     }
 
     @Test
     public void ListIsNULL_whenPassing_thenMapBusinessRuleException() {
-        assertThrows(MapBusinessRuleException.class, () -> mapValidator.validateMap(null));
+        assertThrows(NullOrEmptyParameterException.class, () -> mapValidator.validateMap(null));
     }
 
     @Test

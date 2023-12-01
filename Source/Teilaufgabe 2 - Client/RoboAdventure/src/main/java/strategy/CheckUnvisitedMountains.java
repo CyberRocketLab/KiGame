@@ -1,13 +1,11 @@
 package strategy;
 
-import exceptions.MoveStrategyException;
+import exceptions.NoFoundException;
 import model.data.Terrain;
-import model.state.PlayerPositionState;
 import move.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +23,7 @@ public class CheckUnvisitedMountains implements MoveStrategy {
 
         if (aimNode.isEmpty()) {
             logger.error("All Mountains were found");
-            throw new MoveStrategyException("All Mountains were found");
+            throw new NoFoundException();
         }
 
 

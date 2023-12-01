@@ -1,5 +1,6 @@
 package model.generator;
 
+import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
 import model.data.Terrain;
 import model.state.FortState;
@@ -29,7 +30,7 @@ public class GameMapGenerator {
 
         if (terrainList == null || terrainList.isEmpty()) {
             logger.error("Invalid terrain list received from business logic");
-            throw new IllegalArgumentException("List with terrain list cant be null or empty");
+            throw new NullOrEmptyParameterException();
         }
 
         Collections.shuffle(terrainList, new Random());

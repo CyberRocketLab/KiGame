@@ -1,17 +1,13 @@
 package strategy;
 
-import exceptions.MoveStrategyException;
+import exceptions.NoFoundException;
 import model.data.Terrain;
-import model.state.PlayerPositionState;
 import move.Node;
-import network.NetworkCommunication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CheckUnvisitedFields implements MoveStrategy {
     private static final Logger logger = LoggerFactory.getLogger(CheckUnvisitedFields.class);
@@ -27,7 +23,7 @@ public class CheckUnvisitedFields implements MoveStrategy {
 
         if (aimNode.isEmpty()) {
             logger.error("All Fields were found");
-            throw new MoveStrategyException("All Fields were found");
+            throw new NoFoundException();
         }
         return aimNode.get();
     }

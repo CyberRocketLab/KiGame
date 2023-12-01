@@ -1,6 +1,6 @@
 package move;
 
-import exceptions.MoveException;
+import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
 import model.data.Terrain;
 import model.state.PlayerPositionState;
@@ -22,7 +22,7 @@ public class Move {
     public Move(List<Field> map) {
         if (map == null || map.isEmpty()) {
             logger.error("Provided map for Move class was Null or Empty");
-            throw new MoveException("Map cannot be null or empty");
+            throw new NullOrEmptyParameterException();
         }
 
         map.forEach(field -> this.nodeList.add(new Node(field)));
@@ -50,7 +50,7 @@ public class Move {
     private void setTargetNode(Node targetNode) {
         if (targetNode == null) {
             logger.error("Provided targetNode for Move class was Null");
-            throw new MoveException("Target Node cannot be null");
+            throw new NullOrEmptyParameterException();
         }
 
         sourceNode = getPlayerPosition();
@@ -67,7 +67,7 @@ public class Move {
     public void setMovesToTargetField(Node targetNode) {
         if (targetNode == null) {
             logger.error("Provided targetNode for Move class was Null");
-            throw new MoveException("Target Node cannot be null");
+            throw new NullOrEmptyParameterException();
         }
 
         logger.debug("Setting moves to target Node: X:{} , Y:{}", targetNode.getField().getPositionX(), targetNode.getField().getPositionY());
@@ -109,7 +109,7 @@ public class Move {
     public int calculateMoveCost(Terrain currentTerrain, Terrain nextTerrain) {
         if (currentTerrain == null || nextTerrain == null) {
             logger.error("Provided currentTerrain: {} or nextTerrain: {} for calculateMoveCost was null", currentTerrain, nextTerrain);
-            throw new MoveException("Provided currentTerrain or nextTerrain cannot be null");
+            throw new NullOrEmptyParameterException();
         }
 
         if (currentTerrain == Terrain.GRASS && nextTerrain == Terrain.GRASS) {

@@ -1,6 +1,6 @@
 package strategy;
 
-import exceptions.MoveStrategyException;
+import exceptions.NoFoundException;
 import model.data.Terrain;
 import move.Node;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class LeftCornerUp implements MoveStrategy {
 
         if (nodeToReturn.isEmpty()) {
             logger.error("Could not find Node");
-            throw new MoveStrategyException("Could not find Node");
+            throw new NoFoundException();
         }
 
 

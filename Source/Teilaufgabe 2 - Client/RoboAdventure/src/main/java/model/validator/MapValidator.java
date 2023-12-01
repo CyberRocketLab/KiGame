@@ -1,7 +1,6 @@
 package model.validator;
 
-import exceptions.MapBusinessRuleException;
-import model.data.GameMap;
+import exceptions.NullOrEmptyParameterException;
 import model.position.Position;
 import model.data.Field;
 import model.data.Terrain;
@@ -29,11 +28,11 @@ public class MapValidator {
     public boolean validateMap(List<Field> originalMap) {
         if (originalMap == null || originalMap.isEmpty()) {
             logger.error("Input Map is null or empty");
-            throw new MapBusinessRuleException("The map is empty or null");
+            throw new NullOrEmptyParameterException();
         }
 
         if (!businessRules.validateBusinessRules(originalMap)) {
-            logger.info("Business rule was violating");
+            logger.warn("Business rule was violating");
             return false;
         }
 
@@ -52,7 +51,7 @@ public class MapValidator {
 
 
         if (!businessRules.isAllowedAmountOfWaterOnEdges(matrix)) {
-            logger.info("To much water on edges of map");
+            logger.warn("To much water on edges of map");
             return false;
         }
 
