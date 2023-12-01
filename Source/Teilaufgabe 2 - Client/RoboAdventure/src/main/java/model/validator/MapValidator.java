@@ -33,6 +33,7 @@ public class MapValidator {
         }
 
         if (!businessRules.validateBusinessRules(originalMap)) {
+            logger.info("Business rule was violating");
             return false;
         }
 

@@ -2,16 +2,29 @@ package model.validator;
 
 import model.data.Field;
 import model.data.Terrain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class ServerBusinessRules implements BusinessRules {
+    private static final Logger logger = LoggerFactory.getLogger(ServerBusinessRules.class);
 
     private final int ROWS = 5;
     private final int COLUMNS = 10;
 
     @Override
     public boolean validateBusinessRules(List<Field> map) {
+        if (map == null || map.isEmpty()) {
+            logger.warn("Provided Map for ServerBusinessRules was Empty or Null");
+            return false;
+        }
+
+        if (map.size() != ROWS * COLUMNS) {
+            logger.warn("Provided Map size for ServerBusinessRules was: {} but not: {}", map.size(), ROWS * COLUMNS);
+            return false;
+        }
+
         int minAmountOfWater = 7;
         int minAmountOfGrass = 24;
         int minAmountOfMountain = 5;
@@ -35,6 +48,13 @@ public class ServerBusinessRules implements BusinessRules {
 
     @Override
     public boolean isAllowedAmountOfWaterOnEdges(Field[][] matrix) {
+
+        if (matrix == null || matrix.length == 0) {
+            logger.warn("Provided Matrix for ServerBusinessRules was Empty or Null");
+            return false;
+        }
+
+
         int shortEdgeMaxWater = 2;
         int longEdgeMaxWater = 4;
 
