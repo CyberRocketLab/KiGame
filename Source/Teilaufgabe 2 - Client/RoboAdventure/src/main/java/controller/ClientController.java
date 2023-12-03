@@ -11,18 +11,16 @@ import model.generator.BalancedTerrainDistributionLogic;
 import model.generator.BusinessLogicInterface;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
-import model.state.GameState;
 import model.validator.BusinessRules;
 import model.validator.MapValidator;
 import model.validator.ServerBusinessRules;
 import move.EMoves;
 import move.Move;
-import move.NextFieldToCheck;
+import move.NextFieldFinder;
 import move.Node;
 import network.NetworkCommunication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import strategy.*;
 import view.GameView;
 
 import java.net.URL;
@@ -37,7 +35,6 @@ public class ClientController {
     private int gameActions = 0;
 
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
-
         IClientConverter clientConverter = new ClientConverter();
         IServerConverter serverConverter = new ServerConverter();
 
@@ -48,96 +45,46 @@ public class ClientController {
     }
 
     public synchronized void play() {
-        registerClient();
-        sendClientMap();
-
-        Queue<strategy.MoveStrategy> moveStrategies = setStrategies();
-        Queue<strategy.MoveStrategy> findBurgStrategy = setStrategies();
-
-        GameState gameState = getGamePlayState();
-        game.updateMap(gameState.getUpdatedMap());
+        initializeGame();
+        updateGamePlayState();
 
         Node startPosition = null;
         boolean startIsSet = false;
-
         boolean treasureFoundOnce = false;
         boolean burgFoundOnce = false;
 
         while (gameActions < ALLOWED_GAME_ACTIONS) {
-
             logger.debug("Entering While loop");
 
             // Stop game if LOST or WON
-            if (gameState.getClientState() == ClientState.Lost || gameState.getClientState() == ClientState.Won) {
-                logger.debug("Game: {}", gameState.getClientState());
+            if (game.getClientState() == ClientState.Lost || game.getClientState() == ClientState.Won) {
+                logger.debug("Game: {}", game.getClientState());
                 break;
             }
 
             Move move = new Move(game.getListOfFields());
-
             if (!startIsSet) {
                 startPosition = move.getPlayerPosition();
                 startIsSet = true;
             }
 
-            NextFieldToCheck nextFieldFinder = new NextFieldToCheck(game.getMap(), move.getNodeList(), startPosition);
+            NextFieldFinder nextFieldFinder = new NextFieldFinder(game.getMap(), move.getNodeList(), startPosition);
+            GameRoundHandler gameRoundHandler = new GameRoundHandler(game, move, nextFieldFinder);
 
-
-            if (moveStrategies.isEmpty()) {
-                moveStrategies.add(new CheckUnvisitedFields());
-                logger.debug("Main Strategy is done. Moving to Plan B strategy!");
-            }
-
-            if (findBurgStrategy.isEmpty()) {
-                findBurgStrategy.add(new CheckUnvisitedFields());
-                logger.debug("Main Strategy is done. Moving to Plan B strategy!");
-            }
-
-            boolean isTreasureCollected = gameState.isCollectedTreasure();
-            Node nextFieldToCheck;
-
-            if (game.isTreasureFound() && !isTreasureCollected) {
-                logger.debug("Treasure has been found but not collected, setting next move towards the treasure");
-                Node treasureNode = move.findNode(game.getTreasureField());
-
-                logger.debug("Position of Treasure {}{}.", treasureNode.getField().getPositionX(), treasureNode.getField().getPositionY());
-                move.setMovesToTargetField(treasureNode);
-
-            } else if (isTreasureCollected && game.isFortFound()) {
-                logger.debug("Treasure is collected and Fort has been found!");
-                Node fortNode = move.findNode(game.getFortField());
-
-                logger.debug("Position of Treasure {}{}.", fortNode.getField().getPositionX(), fortNode.getField().getPositionY());
-                move.setMovesToTargetField(fortNode);
-
-            } else if (isTreasureCollected) {
-                logger.debug("Treasure is collected: {}", true);
-                nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(findBurgStrategy.poll(), isTreasureCollected);
-                move.setMovesToTargetField(nextFieldToCheck);
-
-            } else {
-                logger.debug("Treasure is collected: {}", false);
-                nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(moveStrategies.poll(), isTreasureCollected);
-                move.setMovesToTargetField(nextFieldToCheck);
-            }
-
+            gameRoundHandler.handleNextRound();
             List<EMoves> movesToTarget = move.getMoves();
 
-
-            while (gameState.getClientState() != ClientState.Lost && gameState.getClientState() != ClientState.Won) {
+            logger.debug("CLIENT STATE BEFORE LOOP {}", game.getClientState());
+            while (game.getClientState() != ClientState.Lost && game.getClientState() != ClientState.Won) {
                 if (movesToTarget.isEmpty()) {
                     logger.debug("The List with moves is empty");
                     break;
-                }
-
-                if (!treasureFoundOnce) {
+                } else if (!treasureFoundOnce) {
                     if (game.isTreasureFound()) {
                         treasureFoundOnce = true;
                         break;
                     }
-                }
-
-                if (!burgFoundOnce) {
+                } else if (!burgFoundOnce) {
                     if (game.isFortFound()) {
                         burgFoundOnce = true;
                         break;
@@ -145,26 +92,22 @@ public class ClientController {
                 }
 
                 sendMoveToServer(movesToTarget.remove(0));
-
-                gameState = getGamePlayState();
-                game.updateMap(gameState.getUpdatedMap());
+                updateGamePlayState();
 
                 if (++gameActions == ALLOWED_GAME_ACTIONS) {
                     break;
                 }
+
                 logger.info("Current Actions: {}", gameActions);
             }
 
             logger.debug("End of WhileLoop!");
-            logger.debug("Size of moveStrategies:{}", moveStrategies.size());
-
         }
 
         if (gameActions == ALLOWED_GAME_ACTIONS) {
             logger.info("To much actions move: {}", gameActions);
-            System.out.println("Game: " + gameState.getClientState());
+            System.out.println("Game: " + game.getClientState());
         }
-
 
     }
 
@@ -185,39 +128,9 @@ public class ClientController {
         return randomMap;
     }
 
-    private Queue<MoveStrategy> setStrategies() {
-        Queue<MoveStrategy> moveStrategies = new LinkedList<>();
-
-        /*moveStrategies.add(new RightCornerDown());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new RightCornerUp());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new LeftCornerDown());
-        moveStrategies.add(new CheckUnvisitedFields());
-        moveStrategies.add(new LeftCornerUp());
-        */
-        /*moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());
-        moveStrategies.add(new CheckUnvisitedMountains());*/
-
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-        moveStrategies.add(new VisitedNearestMountainToKI());
-
-
-        return moveStrategies;
+    private void initializeGame() {
+        registerClient();
+        sendClientMap();
     }
 
     private boolean validateMap(List<Field> randomMap) {
@@ -231,8 +144,8 @@ public class ClientController {
         networkCommunication.sendClientMap(map);
     }
 
-    private GameState getGamePlayState() {
-        return networkCommunication.getGameState();
+    private void updateGamePlayState() {
+        game.updateGameState(networkCommunication.getGameState());
     }
 
     private void sendMoveToServer(EMoves move) {

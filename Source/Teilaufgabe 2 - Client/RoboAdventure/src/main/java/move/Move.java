@@ -2,11 +2,14 @@ package move;
 
 import exceptions.NullOrEmptyParameterException;
 import model.data.Field;
+import model.data.GameMap;
 import model.data.Terrain;
 import model.state.PlayerPositionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,4 +130,5 @@ public class Move {
     public List<Node> getNodeList() {
         return nodeList;
     }
+
 }

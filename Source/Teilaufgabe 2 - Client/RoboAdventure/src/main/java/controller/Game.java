@@ -3,9 +3,7 @@ package controller;
 import model.data.Field;
 import model.data.FieldCompare;
 import model.data.GameMap;
-import model.state.FortState;
-import model.state.PlayerPositionState;
-import model.state.TreasureState;
+import model.state.*;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -13,6 +11,8 @@ import java.util.*;
 
 public class Game {
     private GameMap map;
+
+    private GameState gameState;
     private Boolean treasureFound = false;
     private Boolean fortFound = false;
     private Field treasureField;
@@ -20,6 +20,19 @@ public class Game {
     private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
 
     private List<Field> visitedFields = new ArrayList<>();
+
+    public void updateGameState(GameState gameState) {
+        this.gameState = gameState;
+        updateMap(gameState.getUpdatedMap());
+    }
+
+    public ClientState getClientState() {
+        return gameState.getClientState();
+    }
+
+    public boolean isCollectedTreasure() {
+        return gameState.isCollectedTreasure();
+    }
 
 
     public void updateMap(List<Field> updatedMap) {

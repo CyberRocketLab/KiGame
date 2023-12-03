@@ -1,5 +1,6 @@
 package move;
 
+import exceptions.NoFoundException;
 import exceptions.NullOrEmptyParameterException;
 import model.data.GameMap;
 import org.slf4j.Logger;
@@ -9,8 +10,8 @@ import strategy.StartAndEndOfAxis;
 
 import java.util.List;
 
-public class NextFieldToCheck {
-    private static final Logger logger = LoggerFactory.getLogger(NextFieldToCheck.class);
+public class NextFieldFinder {
+    private static final Logger logger = LoggerFactory.getLogger(NextFieldFinder.class);
 
     private final List<Node> nodeList;
     private final StartAndEndOfAxis playerAxisX;
@@ -20,7 +21,7 @@ public class NextFieldToCheck {
     private final StartAndEndOfAxis enemyAxisY;
 
 
-    public NextFieldToCheck(GameMap map, List<Node> nodeList, Node startPosition) {
+    public NextFieldFinder(GameMap map, List<Node> nodeList, Node startPosition) {
         if (map == null || nodeList == null || startPosition == null) {
             logger.error("One of provided variables was null. Map: {}, nodeList: {}, startPosition: {}", map, nodeList, startPosition );
             throw new NullOrEmptyParameterException();
@@ -60,7 +61,7 @@ public class NextFieldToCheck {
         playerAxisY = new StartAndEndOfAxis(myHalfStartY, myHalfEndY);
     }
 
-    public Node getNextFieldToCheck(MoveStrategy moveStrategy, boolean isTreasureCollected) {
+    public Node getNextFieldToCheck(MoveStrategy moveStrategy, boolean isTreasureCollected) throws NoFoundException{
         if (moveStrategy == null) {
             logger.error("Provided MoveStrategy parameter for getNextFieldToCheck was null");
             throw new NullOrEmptyParameterException();
@@ -70,6 +71,8 @@ public class NextFieldToCheck {
         if(isTreasureCollected) {
             logger.debug("Enemy Start-X: {} End-X: {}", enemyAxisX.start(), enemyAxisX.end());
             logger.debug("Enemy Start-Y: {} End.Y: {}", enemyAxisY.start(), enemyAxisY.end());
+
+
             return moveStrategy.getFieldWithPosition(enemyAxisX, enemyAxisY, nodeList);
         }
 
