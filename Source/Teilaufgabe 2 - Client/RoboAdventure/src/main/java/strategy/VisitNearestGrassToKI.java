@@ -2,6 +2,7 @@ package strategy;
 
 import exceptions.NoFoundException;
 import model.data.Terrain;
+import model.state.PlayerPositionState;
 import move.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class VisitNearestGrassToKI implements MoveStrategy{
         List<Node> allMountains = nodeList.stream()
                 .filter(node -> node.getField().getPositionX() >= axisX.start() && node.getField().getPositionX() <= axisX.end() &&
                         node.getField().getPositionY() >= axisY.start() && node.getField().getPositionY() <= axisY.end() &&
-                        !node.getField().isVisited() && node.getField().getTerrain() == Terrain.GRASS
+                        !node.getField().isVisited() && node.getField().getTerrain() == Terrain.GRASS && node.getField().getPlayerPositionState() != PlayerPositionState.ME
                 )
                 .toList();
 

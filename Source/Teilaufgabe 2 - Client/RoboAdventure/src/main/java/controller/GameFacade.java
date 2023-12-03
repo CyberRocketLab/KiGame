@@ -1,8 +1,6 @@
 package controller;
 
 import converter.ClientConverter;
-import converter.IClientConverter;
-import converter.IServerConverter;
 import converter.ServerConverter;
 import model.data.ClientData;
 import model.data.Field;
@@ -24,69 +22,48 @@ import org.slf4j.LoggerFactory;
 import view.GameView;
 
 import java.net.URL;
-import java.util.*;
+import java.util.List;
 
-public class ClientController {
-    private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+public class GameFacade {
+    private static final Logger logger = LoggerFactory.getLogger(GameFacade.class);
     private static final int ALLOWED_GAME_ACTIONS = 160;
-    Game game;
-    GameView gameView;
-    NetworkCommunication networkCommunication;
+    private NetworkCommunication networkCommunication;
+    private Game game;
+    private GameMapGenerator mapGenerator;
+    private BusinessLogicInterface businessLogic;
+    private BusinessRules serverBusinessRules;
+    private GameView gameView;
     private int gameActions = 0;
 
-    private GameFacade gameFacade;
-
-    public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
-        IClientConverter clientConverter = new ClientConverter();
-        IServerConverter serverConverter = new ServerConverter();
-
-        networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData, clientConverter, serverConverter);
-        game = new Game();
-        gameView = new GameView();
-        game.addPropertyChangeListener(gameView);
-        this.gameFacade = new GameFacade(serverBaseURL, gameID, clientData);
+    public GameFacade(URL serverBaseURL, GameID gameID, ClientData clientData) {
+        this.networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData, new ClientConverter(), new ServerConverter());
+        this.game = new Game();
+        this.gameView = new GameView();
+        this.game.addPropertyChangeListener(gameView);
+        this.businessLogic = new BalancedTerrainDistributionLogic();
+        this.mapGenerator = new GameMapGenerator(businessLogic);
+        this.serverBusinessRules = new ServerBusinessRules();
     }
 
-    public void playFacade() {
-        gameFacade.startGame();
-        gameFacade.playGame();
-        handleGameEnd();
+    public void startGame() {
+        registerClient();
+        sendClientMap();
+        game.updateGameState(networkCommunication.getGameState());
     }
 
-    private void handleGameEnd() {
-        ClientState clientState = gameFacade.getGameState();
-        switch (clientState) {
-            case Won:
-                System.out.println("Congratulations! You've won the game.");
-                break;
-            case Lost:
-                System.out.println("Game over. Better luck next time!");
-                break;
-            default:
-                System.out.println("The game ended unexpectedly.");
-                break;
-        }
-    }
-
-    public synchronized void play() {
-        initializeGame();
-        updateGamePlayState();
-
+    public void playGame() {
         Node startPosition = null;
         boolean startIsSet = false;
         boolean treasureFoundOnce = false;
         boolean burgFoundOnce = false;
 
         while (gameActions < ALLOWED_GAME_ACTIONS) {
-            logger.debug("Entering While loop");
-
-            // Stop game if LOST or WON
             if (game.getClientState() == ClientState.Lost || game.getClientState() == ClientState.Won) {
-                logger.debug("Game: {}", game.getClientState());
                 break;
             }
 
             Move move = new Move(game.getListOfFields());
+
             if (!startIsSet) {
                 startPosition = move.getPlayerPosition();
                 startIsSet = true;
@@ -98,7 +75,6 @@ public class ClientController {
             gameRoundHandler.handleNextRound();
             List<EMoves> movesToTarget = move.getMoves();
 
-            logger.debug("CLIENT STATE BEFORE LOOP {}", game.getClientState());
             while (game.getClientState() != ClientState.Lost && game.getClientState() != ClientState.Won) {
                 if (movesToTarget.isEmpty()) {
                     logger.debug("The List with moves is empty");
@@ -124,25 +100,19 @@ public class ClientController {
 
                 logger.info("Current Actions: {}", gameActions);
             }
-
-            logger.debug("End of WhileLoop!");
         }
-
-        if (gameActions == ALLOWED_GAME_ACTIONS) {
-            logger.info("To much actions move: {}", gameActions);
-            System.out.println("Game: " + game.getClientState());
-        }
-
     }
 
     private void registerClient() {
         networkCommunication.registerClient();
     }
 
-    private List<Field> generateHalfMap() {
-        BusinessLogicInterface businessLogic = new BalancedTerrainDistributionLogic();
-        GameMapGenerator mapGenerator = new GameMapGenerator(businessLogic);
+    private void sendClientMap() {
+        List<Field> map = generateHalfMap();
+        networkCommunication.sendClientMap(map);
+    }
 
+    private List<Field> generateHalfMap() {
         List<Field> randomMap = mapGenerator.generateRandomMap();
 
         while (!validateMap(randomMap)) {
@@ -152,29 +122,22 @@ public class ClientController {
         return randomMap;
     }
 
-    private void initializeGame() {
-        registerClient();
-        sendClientMap();
-    }
-
     private boolean validateMap(List<Field> randomMap) {
-        BusinessRules businessRules = new ServerBusinessRules();
-        MapValidator mapValidator = new MapValidator(businessRules);
+        MapValidator mapValidator = new MapValidator(serverBusinessRules);
         return mapValidator.validateMap(randomMap);
     }
 
-    private void sendClientMap() {
-        List<Field> map = generateHalfMap();
-        networkCommunication.sendClientMap(map);
+    private void sendMoveToServer(EMoves move) {
+        networkCommunication.sendMove(move);
+        logger.debug("Move was send");
+        game.updateGameState(networkCommunication.getGameState());
     }
 
     private void updateGamePlayState() {
         game.updateGameState(networkCommunication.getGameState());
     }
 
-    private void sendMoveToServer(EMoves move) {
-        networkCommunication.sendMove(move);
+    public ClientState getGameState() {
+        return game.getClientState();
     }
-
-
 }

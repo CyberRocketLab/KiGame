@@ -26,7 +26,7 @@ public class MainGame {
                     "curanova98");
 
             ClientController controller = new ClientController(serverBaseUrl, gameID, clientData);
-            controller.play();
+            controller.playFacade();
 
         } catch (MalformedURLException e) {
             System.out.println("The provided server base URL is not valid.");

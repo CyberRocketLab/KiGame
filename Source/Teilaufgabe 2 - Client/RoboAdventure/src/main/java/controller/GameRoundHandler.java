@@ -45,7 +45,7 @@ public class GameRoundHandler {
             logger.debug("Treasure is collected: {}", game.isCollectedTreasure());
 
             try {
-                nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(visitAllMountains, game.isCollectedTreasure());
+                nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(visitAllGrass, game.isCollectedTreasure());
                 move.setMovesToTargetField(nextFieldToCheck);
             } catch (NoFoundException e) {
                 logger.info(e.getMessage());
