@@ -1,17 +1,9 @@
 package controller;
 
-import converter.ClientConverter;
-import converter.ServerConverter;
-import model.data.ClientData;
 import model.data.Field;
-import model.data.GameID;
-import model.generator.BalancedTerrainDistributionLogic;
-import model.generator.BusinessLogicInterface;
 import model.generator.GameMapGenerator;
 import model.state.ClientState;
-import model.validator.BusinessRules;
 import model.validator.MapValidator;
-import model.validator.ServerBusinessRules;
 import move.EMoves;
 import move.Move;
 import move.NextFieldFinder;
@@ -21,28 +13,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import view.GameView;
 
-import java.net.URL;
 import java.util.List;
 
 public class GameFacade {
     private static final Logger logger = LoggerFactory.getLogger(GameFacade.class);
-    private static final int ALLOWED_GAME_ACTIONS = 160;
-    private NetworkCommunication networkCommunication;
-    private Game game;
-    private GameMapGenerator mapGenerator;
-    private BusinessLogicInterface businessLogic;
-    private BusinessRules serverBusinessRules;
-    private GameView gameView;
+    private final int ALLOWED_GAME_ACTIONS;
+    private final NetworkCommunication networkCommunication;
+    private final Game game;
+    private final GameView gameView;
+    private final GameMapGenerator mapGenerator;
+    private final MapValidator mapValidator;
     private int gameActions = 0;
 
-    public GameFacade(URL serverBaseURL, GameID gameID, ClientData clientData) {
-        this.networkCommunication = new NetworkCommunication(serverBaseURL, gameID, clientData, new ClientConverter(), new ServerConverter());
-        this.game = new Game();
-        this.gameView = new GameView();
-        this.game.addPropertyChangeListener(gameView);
-        this.businessLogic = new BalancedTerrainDistributionLogic();
-        this.mapGenerator = new GameMapGenerator(businessLogic);
-        this.serverBusinessRules = new ServerBusinessRules();
+    public GameFacade(int ALLOWED_GAME_ACTIONS,
+                      NetworkCommunication networkCommunication,
+                      Game game,
+                      GameView gameView,
+                      GameMapGenerator mapGenerator,
+                      MapValidator mapValidator) {
+        this.ALLOWED_GAME_ACTIONS = ALLOWED_GAME_ACTIONS;
+        this.networkCommunication = networkCommunication;
+        this.game = game;
+        this.gameView = gameView;
+        game.addPropertyChangeListener(gameView);
+        this.mapGenerator = mapGenerator;
+        this.mapValidator = mapValidator;
     }
 
     public void startGame() {
@@ -92,7 +87,6 @@ public class GameFacade {
                 }
 
                 sendMoveToServer(movesToTarget.remove(0));
-                updateGamePlayState();
 
                 if (++gameActions == ALLOWED_GAME_ACTIONS) {
                     break;
@@ -123,17 +117,12 @@ public class GameFacade {
     }
 
     private boolean validateMap(List<Field> randomMap) {
-        MapValidator mapValidator = new MapValidator(serverBusinessRules);
         return mapValidator.validateMap(randomMap);
     }
 
     private void sendMoveToServer(EMoves move) {
         networkCommunication.sendMove(move);
         logger.debug("Move was send");
-        game.updateGameState(networkCommunication.getGameState());
-    }
-
-    private void updateGamePlayState() {
         game.updateGameState(networkCommunication.getGameState());
     }
 
