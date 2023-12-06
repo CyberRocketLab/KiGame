@@ -22,14 +22,14 @@ public class VisitNearestGrassToKI implements MoveStrategy{
             throw new NullOrEmptyParameterException();
         }
 
-        List<Node> allMountains = nodeList.stream()
+        List<Node> allGrassFields = nodeList.stream()
                 .filter(node -> node.getField().getPositionX() >= axisX.start() && node.getField().getPositionX() <= axisX.end() &&
                         node.getField().getPositionY() >= axisY.start() && node.getField().getPositionY() <= axisY.end() &&
                         !node.getField().isVisited() && node.getField().getTerrain() == Terrain.GRASS && node.getField().getPlayerPositionState() != PlayerPositionState.ME
                 )
                 .toList();
 
-        Optional<Node> nearestNodeToSource = allMountains.stream()
+        Optional<Node> nearestNodeToSource = allGrassFields.stream()
                 .min(Comparator.comparingInt(Node::getDistanceInMoves));
 
 

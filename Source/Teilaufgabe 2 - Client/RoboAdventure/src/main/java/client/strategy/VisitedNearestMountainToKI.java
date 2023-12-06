@@ -1,5 +1,6 @@
 package client.strategy;
 
+import client.exceptions.NullOrEmptyParameterException;
 import client.model.data.Terrain;
 import client.model.state.PlayerPositionState;
 import client.move.Node;
@@ -16,6 +17,12 @@ public class VisitedNearestMountainToKI implements MoveStrategy {
 
     @Override
     public Node getFieldWithPosition(StartAndEndOfAxis axisX, StartAndEndOfAxis axisY, List<Node> nodeList) {
+        if (axisX == null || axisY == null || nodeList == null || nodeList.isEmpty()) {
+            logger.error("Provided parameters to getFieldWithPosition was Null Or Empty: " +
+                    "axisX: {}, axisY: {}, nodeList: {}", axisX, axisY, nodeList);
+            throw new NullOrEmptyParameterException();
+        }
+
         List<Node> allMountains = nodeList.stream()
                 .filter(node -> node.getField().getPositionX() >= axisX.start() && node.getField().getPositionX() <= axisX.end() &&
                         node.getField().getPositionY() >= axisY.start() && node.getField().getPositionY() <= axisY.end() &&
