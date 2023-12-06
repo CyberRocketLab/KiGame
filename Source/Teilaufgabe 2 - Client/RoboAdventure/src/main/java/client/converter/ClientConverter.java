@@ -1,5 +1,7 @@
 package client.converter;
 
+import client.controller.TurnManager;
+import client.exceptions.NullOrEmptyParameterException;
 import client.model.data.Field;
 import client.model.data.Terrain;
 import client.model.state.ClientState;
@@ -8,15 +10,23 @@ import client.model.state.PlayerPositionState;
 import client.model.state.TreasureState;
 import messagesbase.messagesfromclient.ETerrain;
 import messagesbase.messagesfromserver.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class ClientConverter implements IClientConverter {
+    private static final Logger logger = LoggerFactory.getLogger(ClientConverter.class);
 
     @Override
     public List<Field> getConvertedMap(FullMap serverFullMap) {
+        if (serverFullMap == null) {
+            logger.error("Provided FullMap was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         List<Field> convertedMap = new ArrayList<>();
 
         serverFullMap.stream().forEach(
@@ -29,7 +39,7 @@ public class ClientConverter implements IClientConverter {
                                         getConvertedPlayerPositionState(node.getPlayerPositionState()),
                                         getConvertedTreasureState(node.getTreasureState()),
                                         getConvertedFortState(node.getFortState())
-                                        )
+                                )
                         )
         );
 
@@ -38,6 +48,11 @@ public class ClientConverter implements IClientConverter {
 
     @Override
     public ClientState getConvertedClientState(EPlayerGameState ePlayerGameState) {
+        if (ePlayerGameState == null) {
+            logger.error("Provided EPlayerGameState was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         ClientState clientState = null;
 
         switch (ePlayerGameState) {
@@ -45,12 +60,18 @@ public class ClientConverter implements IClientConverter {
             case Lost -> clientState = ClientState.Lost;
             case MustAct -> clientState = ClientState.MustAct;
             case MustWait -> clientState = ClientState.MustWait;
-        };
+        }
+        ;
         return clientState;
     }
 
 
     private Terrain getConvertedTerrain(ETerrain eTerrain) {
+        if (eTerrain == null) {
+            logger.error("Provided ETerrain was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         Terrain terrain = null;
 
         switch (eTerrain) {
@@ -63,10 +84,13 @@ public class ClientConverter implements IClientConverter {
     }
 
 
-
     private PlayerPositionState getConvertedPlayerPositionState(EPlayerPositionState ePlayerPositionState) {
-        PlayerPositionState playerPositionState = null;
+        if (ePlayerPositionState == null) {
+            logger.error("Provided EPlayerPositionState was null");
+            throw new NullOrEmptyParameterException();
+        }
 
+        PlayerPositionState playerPositionState = null;
 
         switch (ePlayerPositionState) {
             case NoPlayerPresent -> playerPositionState = PlayerPositionState.NOBODY;
@@ -80,6 +104,11 @@ public class ClientConverter implements IClientConverter {
 
 
     private TreasureState getConvertedTreasureState(ETreasureState eTreasureStatetreasureState) {
+        if (eTreasureStatetreasureState == null) {
+            logger.error("Provided ETreasureState was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         TreasureState treasureState = null;
 
         switch (eTreasureStatetreasureState) {
@@ -92,6 +121,11 @@ public class ClientConverter implements IClientConverter {
 
 
     private FortState getConvertedFortState(EFortState eFortStatefortState) {
+        if (eFortStatefortState == null) {
+            logger.error("Provided EFortState was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         FortState fortState = null;
 
         switch (eFortStatefortState) {

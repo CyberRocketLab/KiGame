@@ -20,6 +20,11 @@ public class MapValidator {
     private final BusinessRules businessRules;
 
     public MapValidator(BusinessRules businessRules) {
+        if (businessRules == null) {
+            logger.error("Provided BusinessRules was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         this.businessRules = businessRules;
         this.ROWS = businessRules.getROWS();
         this.COLUMNS = businessRules.getCOLUMNS();
@@ -27,7 +32,7 @@ public class MapValidator {
 
     public boolean validateMap(List<Field> originalMap) {
         if (originalMap == null || originalMap.isEmpty()) {
-            logger.error("Input Map is null or empty");
+            logger.error("Provided Map was null or empty");
             throw new NullOrEmptyParameterException();
         }
 

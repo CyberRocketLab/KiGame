@@ -63,7 +63,7 @@ public class GameMapGenerator {
                 .filter(field -> field.getTerrain() == Terrain.GRASS)
                 .toList();
 
-        int randomPosition = (int)(Math.random() * (grassFields.size() -1));
+        int randomPosition = (int) (Math.random() * (grassFields.size() - 1));
         grassFields.get(randomPosition).setFortState(FortState.MyFort);
     }
 

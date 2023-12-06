@@ -1,5 +1,7 @@
 package client.model.data;
 
+import client.exceptions.NullOrEmptyParameterException;
+
 public class ClientData {
     private final String studentFirstName;
     private final String studentLastName;
@@ -8,6 +10,10 @@ public class ClientData {
 
 
     public ClientData(String studentFirstName, String studentLastName, String studentUAccount) {
+        if (studentFirstName == null || studentLastName == null || studentUAccount == null || studentUAccount.isEmpty()) {
+            throw new NullOrEmptyParameterException();
+        }
+
         this.studentFirstName = studentFirstName;
         this.studentLastName = studentLastName;
         this.studentUAccount = studentUAccount;

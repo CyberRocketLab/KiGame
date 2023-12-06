@@ -1,5 +1,6 @@
 package client.controller;
 
+import client.exceptions.NullOrEmptyParameterException;
 import client.move.Move;
 import client.strategy.MoveStrategy;
 import client.exceptions.NoFoundException;
@@ -19,6 +20,11 @@ public class GameRoundHandler {
     Game game;
 
     public GameRoundHandler(Game game, Move move, NextFieldFinder nextFieldFinder) {
+        if (game == null || move == null || nextFieldFinder == null) {
+            logger.error("Provided Parameter was null: game:{}, move:{}, nextfieldFinder:{}", game, move, nextFieldFinder);
+            throw new NullOrEmptyParameterException();
+        }
+
         this.game = game;
         this.move = move;
         this.nextFieldFinder = nextFieldFinder;
@@ -49,9 +55,7 @@ public class GameRoundHandler {
                 move.setMovesToTargetField(nextFieldToCheck);
             } catch (NoFoundException e) {
                 logger.info(e.getMessage());
-                //nextFieldToCheck = nextFieldFinder.getNextFieldToCheck(visitAllGrass, game.isCollectedTreasure());
-                //move.setMovesToTargetField(nextFieldToCheck);
-                throw new NoFoundException();
+                System.err.println("Could not find Grass");
             }
         }
 

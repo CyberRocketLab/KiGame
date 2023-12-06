@@ -1,5 +1,6 @@
 package client.controller;
 
+import client.exceptions.NullOrEmptyParameterException;
 import client.model.state.ClientState;
 import client.converter.ClientConverter;
 import client.converter.IClientConverter;
@@ -25,8 +26,12 @@ public class ClientController {
     private final GameFacade gameFacade;
 
     public ClientController(URL serverBaseURL, GameID gameID, ClientData clientData) {
-        int ALLOWED_GAME_ACTIONS = 160;
+        if (serverBaseURL == null || gameID == null || clientData == null) {
+            logger.error("Provided Parameters: serverBaseURL:{}, gameID:{} , clientData:{}", serverBaseURL, gameID, clientData);
+            throw new NullOrEmptyParameterException();
+        }
 
+        int ALLOWED_GAME_ACTIONS = 160;
         IClientConverter clientConverter = new ClientConverter();
         IServerConverter serverConverter = new ServerConverter();
 

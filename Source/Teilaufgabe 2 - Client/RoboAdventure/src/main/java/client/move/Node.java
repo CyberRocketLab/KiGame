@@ -20,7 +20,7 @@ public class Node {
 
     public Node(Field field) {
         if (field == null) {
-            logger.error("Provided parameter to Constructor was null");
+            logger.error("Provided Field was null");
             throw new NullOrEmptyParameterException();
         }
 
@@ -29,14 +29,14 @@ public class Node {
 
     public void addAdjacentNodes(List<Node> map) {
         if (map == null || map.isEmpty()) {
-            logger.error("Provided parameter to addAdjacentNodes was null or empty");
+            logger.error("Provided List<Node> map was null or empty");
             throw new NullOrEmptyParameterException();
         }
 
         List<Node> nodes =
                 map.stream()
                         .filter(node ->
-                                        ((node.getField().getPositionX() == (field.getPositionX() + 1) && node.getField().getPositionY() == field.getPositionY()) ||
+                                ((node.getField().getPositionX() == (field.getPositionX() + 1) && node.getField().getPositionY() == field.getPositionY()) ||
                                         (node.getField().getPositionX() == (field.getPositionX() - 1) && node.getField().getPositionY() == field.getPositionY()) ||
                                         (node.getField().getPositionY() == (field.getPositionY() + 1) && node.getField().getPositionX() == field.getPositionX()) ||
                                         (node.getField().getPositionY() == (field.getPositionY() - 1) && node.getField().getPositionX() == field.getPositionX()))
@@ -69,6 +69,11 @@ public class Node {
     }
 
     public void setDistanceInMoves(Integer distanceInMoves) {
+        if (distanceInMoves == null) {
+            logger.error("Provided Integer was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         this.distanceInMoves = distanceInMoves;
     }
 
@@ -77,6 +82,11 @@ public class Node {
     }
 
     public void setShortestPathFromSource(List<Node> shortestPathFromSource) {
+        if (shortestPathFromSource == null || shortestPathFromSource.isEmpty()) {
+            logger.error("Provided List<Node> shortestPathFromSource was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         this.shortestPathFromSource = shortestPathFromSource;
     }
 
@@ -86,7 +96,6 @@ public class Node {
                 "field= X:" + field.getPositionX() + " Y:" + field.getPositionY() +
                 '}';
     }
-
 
     public Field getField() {
         return field;

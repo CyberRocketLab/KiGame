@@ -53,7 +53,7 @@ class NextFieldFinderTest {
     }
 
     @Test
-    public void givenValidaParameters_whenCallingGetNextFieldToCheck_thenAssertWorks () {
+    public void givenValidaParameters_whenCallingGetNextFieldToCheck_thenAssertWorks () throws NoFoundException {
         MoveStrategy moveStrategy = Mockito.mock(MoveStrategy.class);
         Node node = Mockito.mock(Node.class);
         when(moveStrategy.getFieldWithPosition(any(), any(), eq(nodeList))).thenReturn(node);
@@ -64,7 +64,7 @@ class NextFieldFinderTest {
     }
 
     @Test
-    public void givenNodeThatCannotBeFound_whenCallingGetNextFieldToCheck_thenNoFoundException () {
+    public void givenNodeThatCannotBeFound_whenCallingGetNextFieldToCheck_thenNoFoundException () throws NoFoundException {
         MoveStrategy moveStrategy = Mockito.mock(MoveStrategy.class);
         Node node = Mockito.mock(Node.class);
         when(moveStrategy.getFieldWithPosition(any(), any(), eq(nodeList))).thenThrow(new NoFoundException());

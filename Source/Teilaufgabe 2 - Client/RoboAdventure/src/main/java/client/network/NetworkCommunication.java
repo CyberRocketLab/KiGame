@@ -1,5 +1,6 @@
 package client.network;
 
+import client.exceptions.NullOrEmptyParameterException;
 import client.model.state.ClientState;
 import client.converter.IClientConverter;
 import client.converter.IServerConverter;
@@ -39,6 +40,12 @@ public class NetworkCommunication {
                                 ClientData clientData,
                                 IClientConverter clientConverter,
                                 IServerConverter serverConverter) {
+        if (serverBaseURL == null || gameID == null || clientData == null || clientConverter == null || serverConverter == null) {
+            logger.error("Provided Parameter was null");
+            throw new NullOrEmptyParameterException();
+        }
+
+
         this.gameID = gameID;
         this.clientData = clientData;
 
@@ -86,6 +93,11 @@ public class NetworkCommunication {
     }
 
     public void sendClientMap(List<Field> clientMap) {
+        if (clientMap == null || clientMap.isEmpty()) {
+            logger.error("Provided List<Field> clientMap was null or empty");
+            throw new NullOrEmptyParameterException();
+        }
+
         List<PlayerHalfMapNode> clientMapToSend =
                 serverConverter.convertToPlayerHalfMapNode(clientMap);
 
@@ -131,6 +143,11 @@ public class NetworkCommunication {
     }
 
     public void sendMove(EMoves move) {
+        if (move == null) {
+            logger.error("Provided EMoves was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         PlayerMove playerMove = PlayerMove.of(clientData.getPlayerID(), serverConverter.convertToEMove(move));
 
         Mono<ResponseEnvelope> webAccess =

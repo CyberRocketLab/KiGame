@@ -1,10 +1,21 @@
 package client.move;
 
+import client.exceptions.NullOrEmptyParameterException;
+import client.model.validator.ServerBusinessRules;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class Graph {
+    private static final Logger logger = LoggerFactory.getLogger(Graph.class);
 
     public static void calculateShortestPathFromSource(Node source) {
+        if (source == null) {
+            logger.error("Provided Node was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         source.setDistanceInMoves(0);
 
         Set<Node> visitedNodes = new HashSet<>();
@@ -31,6 +42,10 @@ public class Graph {
     }
 
     private static void calculateMinimumDistance(Node nodeToEvaluate, int moves, Node sourceNode) {
+        if (nodeToEvaluate == null || sourceNode == null || moves < 0) {
+            logger.error("Provided nodeToEvaluate or sourceNode was null or moves was < 0. nodeToEvaluate: {}, moves: {}, sourceNode: {}", nodeToEvaluate, moves, sourceNode);
+            throw new NullOrEmptyParameterException();
+        }
 
         int sumDistance = moves + sourceNode.getDistanceInMoves();
 

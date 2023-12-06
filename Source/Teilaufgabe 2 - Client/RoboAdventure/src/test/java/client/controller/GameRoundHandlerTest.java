@@ -62,18 +62,4 @@ class GameRoundHandlerTest {
         verify(move, times(1)).setMovesToTargetField(node);
     }
 
-    @Test
-    public void givenTreasureNotFound_whenNoFoundingNextField_shouldThrowException() {
-        when(game.isTreasureFound()).thenReturn(false);
-        when(game.isCollectedTreasure()).thenReturn(false);
-        when(move.findNode(any())).thenReturn(node);
-
-
-        when(nextFieldFinder.getNextFieldToCheck(any(), anyBoolean())).thenThrow(new NoFoundException());
-
-        assertThrows(NoFoundException.class, () -> {
-            gameRoundHandler.handleNextRound();
-        });
-    }
-
 }

@@ -1,25 +1,34 @@
 package client.controller;
 
+import client.exceptions.NullOrEmptyParameterException;
 import client.model.data.Field;
 import client.model.data.GameMap;
 import client.model.state.*;
 import client.model.data.FieldCompare;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 
 public class Game {
+    private static final Logger logger = LoggerFactory.getLogger(Game.class);
+    private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
     private GameMap map;
     private GameState gameState;
     private Boolean treasureFound = false;
     private Boolean fortFound = false;
     private Field treasureField;
     private Field fortField;
-    private final PropertyChangeSupport changes = new PropertyChangeSupport(this);
-
     private List<Field> visitedFields = new ArrayList<>();
 
     public void updateGameState(GameState gameState) {
+        if (gameState == null) {
+            logger.error("Provided GameState was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         this.gameState = gameState;
         updateMap(gameState.getUpdatedMap());
     }
@@ -34,6 +43,11 @@ public class Game {
 
 
     public void updateMap(List<Field> updatedMap) {
+        if (updatedMap == null) {
+            logger.error("Provided List<Field> was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         updatedMap.sort(new FieldCompare());
 
         GameMap beforeChange = this.map;
@@ -43,7 +57,7 @@ public class Game {
                 .filter(field -> field.getTreasureState() == TreasureState.GoalTreasure)
                 .findFirst();
 
-        if(foundTreasure.isPresent()) {
+        if (foundTreasure.isPresent()) {
             treasureFound = true;
             treasureField = foundTreasure.get();
         }
@@ -52,7 +66,7 @@ public class Game {
                 .filter(field -> field.getFortState() == FortState.EnemyFort)
                 .findFirst();
 
-        if(foundFort.isPresent()) {
+        if (foundFort.isPresent()) {
             fortFound = true;
             fortField = foundFort.get();
         }
@@ -64,8 +78,8 @@ public class Game {
         changes.firePropertyChange("map", beforeChange, map);
     }
 
-    public void setFieldsToVisible(List<Field> updatedMap) {
-        for(Field field: visitedFields) {
+    private void setFieldsToVisible(List<Field> updatedMap) {
+        for (Field field : visitedFields) {
             Optional<Field> setField = updatedMap.stream()
                     .filter(f -> f.getPositionX() == field.getPositionX() && f.getPositionY() == field.getPositionY())
                     .findFirst();
@@ -74,17 +88,22 @@ public class Game {
         }
     }
 
-    public void setPlayerPositionAsVisited(List<Field> updatedMap) {
+    private void setPlayerPositionAsVisited(List<Field> updatedMap) {
         Optional<Field> currentPlayerPosition = updatedMap.stream()
                 .filter(field -> field.getPlayerPositionState() == PlayerPositionState.ME).findFirst();
 
-        if(currentPlayerPosition.isPresent()) {
+        if (currentPlayerPosition.isPresent()) {
             currentPlayerPosition.get().setVisited(true);
             visitedFields.add(currentPlayerPosition.get());
         }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (listener == null) {
+            logger.error("Provided PropertyChangeListener was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         changes.addPropertyChangeListener(listener);
     }
 

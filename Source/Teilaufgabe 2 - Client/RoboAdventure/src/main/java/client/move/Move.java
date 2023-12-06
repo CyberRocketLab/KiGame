@@ -21,14 +21,12 @@ public class Move {
 
     public Move(List<Field> map) {
         if (map == null || map.isEmpty()) {
-            logger.error("Provided map for Move class was Null or Empty");
+            logger.error("Provided List<Field> map was null or empty");
             throw new NullOrEmptyParameterException();
         }
 
         map.forEach(field -> this.nodeList.add(new Node(field)));
         nodeList.forEach(node -> node.addAdjacentNodes(nodeList));
-
-        // Setting source node to be player Position
         sourceNode = getPlayerPosition();
 
         Graph.calculateShortestPathFromSource(sourceNode);
@@ -41,6 +39,11 @@ public class Move {
     }
 
     public Node findNode(Field field) {
+        if (field == null) {
+            logger.error("Provided Field was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         return nodeList.stream()
                 .filter(node -> node.getField().getPositionX() == field.getPositionX() && node.getField().getPositionY() == field.getPositionY())
                 .findFirst().orElseThrow();
@@ -49,7 +52,7 @@ public class Move {
 
     private void setTargetNode(Node targetNode) {
         if (targetNode == null) {
-            logger.error("Provided targetNode for Move class was Null");
+            logger.error("Provided Node was null");
             throw new NullOrEmptyParameterException();
         }
 
@@ -66,7 +69,7 @@ public class Move {
 
     public void setMovesToTargetField(Node targetNode) {
         if (targetNode == null) {
-            logger.error("Provided targetNode for Move class was Null");
+            logger.error("Provided Node was null");
             throw new NullOrEmptyParameterException();
         }
 
@@ -79,27 +82,25 @@ public class Move {
             Node currentNode = movesToTargetField.get(i);
             Node nextNode = movesToTargetField.get(i + 1);
 
-
-            int deltaX = nextNode.getField().getPositionX() - currentNode.getField().getPositionX();
-            int deltaY = nextNode.getField().getPositionY() - currentNode.getField().getPositionY();
+            int differenceBetweenPosX = nextNode.getField().getPositionX() - currentNode.getField().getPositionX();
+            int differenceBetweenPosY = nextNode.getField().getPositionY() - currentNode.getField().getPositionY();
 
             int moveCost = calculateMoveCost(currentNode.getField().getTerrain(), nextNode.getField().getTerrain());
 
             for (int cost = 0; cost < moveCost; cost++) {
-                if (deltaX > 0) {
+                if (differenceBetweenPosX > 0) {
                     moves.add(EMoves.Right);
-                } else if (deltaX < 0) {
+                } else if (differenceBetweenPosX < 0) {
                     moves.add(EMoves.Left);
-                } else if (deltaY > 0) {
+                } else if (differenceBetweenPosY > 0) {
                     moves.add(EMoves.Down);
-                } else if (deltaY < 0) {
+                } else if (differenceBetweenPosY < 0) {
                     moves.add(EMoves.Up);
                 }
             }
         }
 
         logger.debug("Moves to Target Node: {}", moves);
-
     }
 
     public List<EMoves> getMoves() {

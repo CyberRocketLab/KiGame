@@ -8,19 +8,17 @@ import java.util.*;
 
 public class GameMap {
     private static final Logger logger = LoggerFactory.getLogger(GameMap.class);
-    private final List<Field> fields;
-    private int edgeOfX;
-    private int edgeOfY;
-
     private static final int SQUARE_EDGE_X = 9;
     private static final int SQUARE_EDGE_Y = 9;
     private static final int RECTANGLE_EDGE_X = 19;
     private static final int RECTANGLE_EDGE_Y = 4;
-
+    private final List<Field> fields;
+    private int edgeOfX;
+    private int edgeOfY;
 
     public GameMap(List<Field> fields) {
         if (fields == null || fields.isEmpty()) {
-            logger.error("Map initialization failed: input list is null or empty");
+            logger.error("Provided List<Field> fields was null");
             throw new NullOrEmptyParameterException();
         }
 
@@ -32,7 +30,7 @@ public class GameMap {
         boolean isRectangleMap = fields.stream()
                 .anyMatch(field -> field.getPositionX() == RECTANGLE_EDGE_X);
 
-        if(isRectangleMap) {
+        if (isRectangleMap) {
             edgeOfX = RECTANGLE_EDGE_X;
             edgeOfY = RECTANGLE_EDGE_Y;
         } else {

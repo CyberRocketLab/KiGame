@@ -1,14 +1,22 @@
 package client.controller;
 
+import client.exceptions.NullOrEmptyParameterException;
 import client.model.state.ClientState;
-import client.model.state.GameState;
 import client.network.NetworkCommunication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TurnManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(TurnManager.class);
     NetworkCommunication networkCommunication;
 
     public TurnManager(NetworkCommunication networkCommunication) {
+        if (networkCommunication == null) {
+            logger.error("Provided NetworkCommunication was null");
+            throw new NullOrEmptyParameterException();
+        }
+
         this.networkCommunication = networkCommunication;
     }
 

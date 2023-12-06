@@ -15,7 +15,7 @@ import java.util.Optional;
 public class VisitNearestGrassToKI implements MoveStrategy{
     private static final Logger logger = LoggerFactory.getLogger(VisitNearestGrassToKI.class);
     @Override
-    public Node getFieldWithPosition(StartAndEndOfAxis axisX, StartAndEndOfAxis axisY, List<Node> nodeList) {
+    public Node getFieldWithPosition(StartAndEndOfAxis axisX, StartAndEndOfAxis axisY, List<Node> nodeList) throws NoFoundException {
         if (axisX == null || axisY == null || nodeList == null || nodeList.isEmpty()) {
             logger.error("Provided parameters to getFieldWithPosition was Null Or Empty: " +
                     "axisX: {}, axisY: {}, nodeList: {}", axisX, axisY, nodeList);
