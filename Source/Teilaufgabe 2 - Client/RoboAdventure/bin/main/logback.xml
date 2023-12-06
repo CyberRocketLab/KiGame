@@ -10,11 +10,14 @@
    </appender>
 
    <!-- We can set the logging behaviour for specific packages, e.g. package "client" and it's sub-packages -->
-      <logger name="controller" level="DEBUG"/>
-      <logger name="network" level="INFO"/>
-      <logger name="move" level="DEBUG"/>
+   <logger name="client" level="DEBUG"/>
+    <logger name="client" level="INFO"/>
+    <logger name="client" level="DEBUG"/>
+    <logger name="client" level="ERROR"/>
 
-     <!-- We can even control the logging behaviour for other libaries thanks to SLF4J -->
+
+
+   <!-- We can even control the logging behaviour for other libaries thanks to SLF4J -->
    <!-- The logger configurations below significantly reduces the very chatty output of webflux -->
    <logger name="reactor" level="ERROR"/>
    <logger name="reactor.Mono" level="ERROR"/>

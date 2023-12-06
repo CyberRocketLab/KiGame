@@ -1,19 +1,10 @@
 package client.main;
 
-import controller.ClientController;
-import controller.Game;
-import model.data.*;
-import model.generator.BalancedTerrainDistributionLogic;
-import model.generator.BusinessLogicInterface;
-import model.generator.GameMapGenerator;
-import model.validator.MapValidator;
-import view.GameView;
-
+import client.controller.ClientController;
+import client.model.data.ClientData;
+import client.model.data.GameID;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-
-import static java.lang.Thread.sleep;
 
 public class MainGame {
     public static void main(String[] args) {
