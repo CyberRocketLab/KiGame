@@ -24,9 +24,14 @@ public class VisitedNearestMountainToKI implements MoveStrategy {
         }
 
         List<Node> allMountains = nodeList.stream()
-                .filter(node -> node.getField().getPositionX() >= axisX.start() && node.getField().getPositionX() <= axisX.end() &&
-                        node.getField().getPositionY() >= axisY.start() && node.getField().getPositionY() <= axisY.end() &&
-                        !node.getField().isVisited() && node.getField().getTerrain() == Terrain.MOUNTAIN && node.getField().getPlayerPositionState() != PlayerPositionState.ME
+                .filter(node -> node.getField().getPositionX() >= axisX.start() &&
+                        node.getField().getPositionX() <= axisX.end() &&
+                        node.getField().getPositionY() >= axisY.start() &&
+                        node.getField().getPositionY() <= axisY.end() &&
+                        !node.getField().isVisited() &&
+                        node.getField().getTerrain() == Terrain.MOUNTAIN &&
+                        node.getField().getPlayerPositionState() != PlayerPositionState.ME &&
+                        node.getField().getPlayerPositionState() != PlayerPositionState.BOTH
                 )
                 .toList();
 

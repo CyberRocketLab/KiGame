@@ -12,8 +12,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class VisitNearestGrassToKI implements MoveStrategy{
+public class VisitNearestGrassToKI implements MoveStrategy {
     private static final Logger logger = LoggerFactory.getLogger(VisitNearestGrassToKI.class);
+
     @Override
     public Node getFieldWithPosition(StartAndEndOfAxis axisX, StartAndEndOfAxis axisY, List<Node> nodeList) throws NoFoundException {
         if (axisX == null || axisY == null || nodeList == null || nodeList.isEmpty()) {
@@ -23,9 +24,14 @@ public class VisitNearestGrassToKI implements MoveStrategy{
         }
 
         List<Node> allGrassFields = nodeList.stream()
-                .filter(node -> node.getField().getPositionX() >= axisX.start() && node.getField().getPositionX() <= axisX.end() &&
-                        node.getField().getPositionY() >= axisY.start() && node.getField().getPositionY() <= axisY.end() &&
-                        !node.getField().isVisited() && node.getField().getTerrain() == Terrain.GRASS && node.getField().getPlayerPositionState() != PlayerPositionState.ME
+                .filter(node -> node.getField().getPositionX() >= axisX.start() &&
+                        node.getField().getPositionX() <= axisX.end() &&
+                        node.getField().getPositionY() >= axisY.start() &&
+                        node.getField().getPositionY() <= axisY.end() &&
+                        !node.getField().isVisited() &&
+                        node.getField().getTerrain() == Terrain.GRASS &&
+                        node.getField().getPlayerPositionState() != PlayerPositionState.ME &&
+                        node.getField().getPlayerPositionState() != PlayerPositionState.BOTH
                 )
                 .toList();
 

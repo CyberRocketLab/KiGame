@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 
 public class GameView implements PropertyChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(GameView.class);
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("map".equals(evt.getPropertyName())) {
@@ -34,14 +35,16 @@ public class GameView implements PropertyChangeListener {
 
             switch (field.getTerrain()) {
                 case WATER:
-                   System.out.print(Character.toString(0x1F30A) + " ");
+                    System.out.print(Character.toString(0x1F30A) + " ");
                     break;
                 case MOUNTAIN:
-                    if(field.getPlayerPositionState() == PlayerPositionState.ME ) {
+                    if (field.getPlayerPositionState() == PlayerPositionState.ME) {
                         System.out.print(Character.toString(0x1F604) + " ");
                     } else if (field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
                         System.out.print(Character.toString(0x1F4A9) + " ");
-                    }else {
+                    } else if (field.getPlayerPositionState() == PlayerPositionState.BOTH) {
+                        System.out.print(Character.toString(0x1F49A) + " ");
+                    } else {
                         System.out.print(Character.toString(0x26F0) + " ");
                     }
                     break;
@@ -49,12 +52,14 @@ public class GameView implements PropertyChangeListener {
                 case GRASS:
                     if (field.getFortState() == FortState.MyFort || field.getFortState() == FortState.EnemyFort) {
                         System.out.print(Character.toString(0x1F3F0) + " ");
-                    } else if(field.getTreasureState() == TreasureState.GoalTreasure) {
+                    } else if (field.getTreasureState() == TreasureState.GoalTreasure) {
                         System.out.print(Character.toString(0x1F4B0) + " ");
-                    } else if(field.getPlayerPositionState() == PlayerPositionState.ME) {
+                    } else if (field.getPlayerPositionState() == PlayerPositionState.ME) {
                         System.out.print(Character.toString(0x1F604) + " ");
                     } else if (field.getPlayerPositionState() == PlayerPositionState.ENEMY) {
                         System.out.print(Character.toString(0x1F4A9) + " ");
+                    } else if (field.getPlayerPositionState() == PlayerPositionState.BOTH) {
+                        System.out.print(Character.toString(0x1F49A) + " ");
                     } else {
                         System.out.print(Character.toString(0x1F33F) + " ");
                     }

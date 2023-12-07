@@ -23,7 +23,5 @@ public class MainGame {
         } catch (MalformedURLException e) {
             System.out.println("The provided server base URL is not valid.");
         }
-
-
     }
 }
