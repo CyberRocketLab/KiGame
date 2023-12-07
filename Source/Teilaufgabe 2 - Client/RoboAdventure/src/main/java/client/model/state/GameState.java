@@ -16,6 +16,7 @@ public class GameState {
     boolean collectedTreasure = false;
 
     public void addMap(List<Field> serverMap) {
+        logger.info("Adding Server Map to Client GameState");
         if (serverMap == null) {
             logger.error("Provided List<Field> serverMap was null");
             throw new NullOrEmptyParameterException();
@@ -24,6 +25,7 @@ public class GameState {
     }
 
     public void addClientState(ClientState clientState, boolean hasCollectedTreasure) {
+        logger.info("Adding ClientState to GameState");
         if (clientState == null) {
             logger.error("Provided ClientState was null");
             throw new NullOrEmptyParameterException();

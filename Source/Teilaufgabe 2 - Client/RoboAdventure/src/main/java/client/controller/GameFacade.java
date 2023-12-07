@@ -49,6 +49,7 @@ public class GameFacade {
                 notification);
 
         if (notification.hasErrors()) {
+            logger.error("Parameter validation errors: {}", notification.getErrors());
             throw new GameFacadeException(notification.getErrors());
         }
 
@@ -64,12 +65,14 @@ public class GameFacade {
 
 
     public void startGame() {
+        logger.info("Starting Game");
         registerClient();
         sendClientMap();
         game.updateGameState(networkCommunication.getGameState());
     }
 
     public void playGame() {
+        logger.info("Starting playing Game");
         Node startPosition = null;
         boolean startIsSet = false;
         boolean treasureFoundOnce = false;
@@ -149,7 +152,7 @@ public class GameFacade {
         turnManager.waitForMyTurn();
 
         networkCommunication.sendMove(move);
-        logger.debug("Move was send");
+        logger.debug("Move:{} was send successfully", move);
 
         game.updateGameState(networkCommunication.getGameState());
     }

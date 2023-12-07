@@ -22,6 +22,7 @@ public class ClientConverter implements IClientConverter {
 
     @Override
     public List<Field> getConvertedMap(FullMap serverFullMap) {
+        logger.info("Converting serverFullMap to ClientMap");
         if (serverFullMap == null) {
             logger.error("Provided FullMap was null");
             throw new NullOrEmptyParameterException();
@@ -48,6 +49,7 @@ public class ClientConverter implements IClientConverter {
 
     @Override
     public ClientState getConvertedClientState(EPlayerGameState ePlayerGameState) {
+        logger.info("Converting Server EPlayerGameState to Client PlayerGameState");
         if (ePlayerGameState == null) {
             logger.error("Provided EPlayerGameState was null");
             throw new NullOrEmptyParameterException();

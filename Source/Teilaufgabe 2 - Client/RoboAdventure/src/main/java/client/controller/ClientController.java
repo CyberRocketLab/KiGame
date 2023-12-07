@@ -65,13 +65,14 @@ public class ClientController {
                         turnManager);
     }
 
-    public void playFacade() {
+    public void play() {
         gameFacade.startGame();
         gameFacade.playGame();
         handleGameEnd();
     }
 
     private void handleGameEnd() {
+        logger.info("Handling GameEnd");
         ClientState clientState = gameFacade.getGameState();
         switch (clientState) {
             case Won:

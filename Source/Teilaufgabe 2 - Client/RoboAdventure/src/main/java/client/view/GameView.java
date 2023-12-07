@@ -1,15 +1,19 @@
 package client.view;
 
+import client.controller.Game;
 import client.model.data.Field;
 import client.model.data.GameMap;
 import client.model.state.FortState;
 import client.model.state.PlayerPositionState;
 import client.model.state.TreasureState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class GameView implements PropertyChangeListener {
+    private static final Logger logger = LoggerFactory.getLogger(GameView.class);
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("map".equals(evt.getPropertyName())) {
@@ -18,6 +22,7 @@ public class GameView implements PropertyChangeListener {
     }
 
     public void updateMap(GameMap newMap) {
+        logger.info("Updating GameMap");
         int i = 0;
 
         for (Field field : newMap.getMap()) {

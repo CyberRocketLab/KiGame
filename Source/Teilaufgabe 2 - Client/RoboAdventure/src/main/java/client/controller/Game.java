@@ -24,6 +24,7 @@ public class Game {
     private List<Field> visitedFields = new ArrayList<>();
 
     public void updateGameState(GameState gameState) {
+        logger.info("Updating GameState of Game");
         if (gameState == null) {
             logger.error("Provided GameState was null");
             throw new NullOrEmptyParameterException();
@@ -43,6 +44,7 @@ public class Game {
 
 
     public void updateMap(List<Field> updatedMap) {
+        logger.info("Updating Map of Game");
         if (updatedMap == null) {
             logger.error("Provided List<Field> was null");
             throw new NullOrEmptyParameterException();

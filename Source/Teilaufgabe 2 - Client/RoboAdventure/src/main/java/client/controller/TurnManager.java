@@ -21,6 +21,7 @@ public class TurnManager {
     }
 
     public void waitForMyTurn() {
+        logger.info("Waiting for KI turn");
         ClientState state = networkCommunication.getGameState().getClientState();
         while (state != ClientState.MustAct) {
             try {

@@ -17,6 +17,7 @@ public class GameMap {
     private int edgeOfY;
 
     public GameMap(List<Field> fields) {
+        logger.info("Initializing GameMap");
         if (fields == null || fields.isEmpty()) {
             logger.error("Provided List<Field> fields was null");
             throw new NullOrEmptyParameterException();

@@ -15,6 +15,7 @@ public class ServerBusinessRules implements BusinessRules {
 
     @Override
     public boolean validateBusinessRules(List<Field> map) {
+        logger.info("Starting Validating BusinessRules of Map");
         if (map == null || map.isEmpty()) {
             logger.warn("Provided Map for ServerBusinessRules was Empty or Null");
             return false;

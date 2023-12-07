@@ -5,16 +5,15 @@ import java.util.Comparator;
 public class FieldCompare implements Comparator<Field> {
     @Override
     public int compare(Field fieldFirst, Field fieldSecond) {
-
-        if(fieldFirst.getPositionY() < fieldSecond.getPositionY()) {
+        if (fieldFirst.getPositionY() < fieldSecond.getPositionY()) {
             return -1;
-        } else if(fieldFirst.getPositionY() > fieldSecond.getPositionY()) {
+        } else if (fieldFirst.getPositionY() > fieldSecond.getPositionY()) {
             return 1;
         }
 
-        if(fieldFirst.getPositionX() < fieldSecond.getPositionX()) {
+        if (fieldFirst.getPositionX() < fieldSecond.getPositionX()) {
             return -1;
-        } else if(fieldFirst.getPositionX() > fieldSecond.getPositionX()) {
+        } else if (fieldFirst.getPositionX() > fieldSecond.getPositionX()) {
             return 1;
         }
 

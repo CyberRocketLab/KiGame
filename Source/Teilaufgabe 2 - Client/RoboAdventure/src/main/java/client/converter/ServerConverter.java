@@ -18,6 +18,7 @@ public class ServerConverter implements IServerConverter {
 
     @Override
     public List<PlayerHalfMapNode> convertToPlayerHalfMapNode(List<Field> clientMap) {
+        logger.info("Converting Client Map to Server Map");
         if (clientMap == null) {
             logger.error("Provided ClientMap was null");
             throw new NullOrEmptyParameterException();
@@ -48,6 +49,7 @@ public class ServerConverter implements IServerConverter {
 
     @Override
     public EMove convertToEMove(EMoves move) {
+        logger.info("Converting Client Move to Server EMove");
         if (move == null) {
             logger.error("Provided EMove was null");
             throw new NullOrEmptyParameterException();

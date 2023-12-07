@@ -59,6 +59,7 @@ public class NetworkCommunication {
     }
 
     public GameState getGameState() {
+        logger.info("Requesting GameState from Server");
         Mono<ResponseEnvelope> webAccess =
                 baseWebClient.method(HttpMethod.GET)
                         .uri("/" + gameID.id() + "/states/" + clientData.getPlayerID())
@@ -93,6 +94,7 @@ public class NetworkCommunication {
     }
 
     public void sendClientMap(List<Field> clientMap) {
+        logger.info("Sending Client Map");
         if (clientMap == null || clientMap.isEmpty()) {
             logger.error("Provided List<Field> clientMap was null or empty");
             throw new NullOrEmptyParameterException();
@@ -120,6 +122,7 @@ public class NetworkCommunication {
     }
 
     public void registerClient() {
+        logger.info("Registering Client: {} ", clientData.getStudentFirstName());
         PlayerRegistration playerReg =
                 new PlayerRegistration(
                         clientData.getStudentFirstName(),
@@ -143,6 +146,7 @@ public class NetworkCommunication {
     }
 
     public void sendMove(EMoves move) {
+        logger.info("Starting sending Move to Server");
         if (move == null) {
             logger.error("Provided EMoves was null");
             throw new NullOrEmptyParameterException();
@@ -160,7 +164,7 @@ public class NetworkCommunication {
         if (result.getState() == ERequestState.Error) {
             System.err.println("Move error, errormessage: " + result.getExceptionMessage());
         } else {
-            logger.info("Move was send by Player={}", clientData.getStudentFirstName());
+            logger.info("Move successfully sent by Player = {}", clientData.getStudentFirstName());
         }
     }
 
